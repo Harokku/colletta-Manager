@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import '../../node_modules/react-vis/dist/style.css';
+import '../../../node_modules/react-vis/dist/style.css';
 import {graphql, gql} from 'react-apollo'
 import {Dimmer, Loader, Segment} from 'semantic-ui-react'
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine} from 'recharts'
