@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import '../../node_modules/react-vis/dist/style.css';
 import {graphql, gql} from 'react-apollo'
 import {Dimmer, Loader, Segment} from 'semantic-ui-react'
-import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts'
+import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine} from 'recharts'
 
-class CollectGraph extends Component {
+class VehicleLoadGraph extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -12,23 +12,19 @@ class CollectGraph extends Component {
     }
   }
 
-  aggregateWithReduce = (data, markets) => {
+  aggregateWithReduce = (data) => {
     return data
       .reduce((accumulator, currValue) => {
-        if (!accumulator.some(el => el.id === currValue.supermarket.id)) {
-          let newItem = {};
-          let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
-          newItem['id'] = currValue.supermarket.id;
-          newItem['markets'] =  markets[marketIndex].city + ' - ' + markets[marketIndex].name
-          newItem['Kg'] = 0;
-          accumulator.push(newItem)
-        }
-        accumulator[accumulator.findIndex(index => index.id === currValue.supermarket.id)].Kg += currValue.loadedQty;
+        let newItem = {};
+        newItem['id'] = currValue.id;
+        newItem['vehicles'] = currValue.radioCode;
+        newItem['load'] = (currValue.actualLoad + currValue.tare) / currValue.tmfl * 100
+        accumulator.push(newItem)
         return accumulator
       }, [])
       .sort((a, b) => {
-        let nameA = a.markets.toUpperCase(); // ignore upper and lowercase
-        let nameB = b.markets.toUpperCase(); // ignore upper and lowercase
+        let nameA = a.vehicles.toUpperCase(); // ignore upper and lowercase
+        let nameB = b.vehicles.toUpperCase(); // ignore upper and lowercase
         if (nameA < nameB) {
           return -1;
         }
@@ -39,12 +35,11 @@ class CollectGraph extends Component {
         // names must be equal
         return 0;
       });
-
   };
 
   componentWillReceiveProps(nextProp) {
     if (this.props.data.loading && !nextProp.data.loading) {
-      this.setState({graphData: this.aggregateWithReduce(nextProp.data.allCollects, nextProp.data.allSupermarkets)})
+      this.setState({graphData: this.aggregateWithReduce(nextProp.data.allVehicles)})
     }
   }
 
@@ -75,19 +70,21 @@ class CollectGraph extends Component {
     }
 
     // 3
-    //const collectsData = this.props.data.allCollects
-    //const marketsIdList = this.props.data.allSupermarkets
+    //const vehiclesData = this.props.data.vehiclesData
+
 
     return (
       <div>
         <Segment color="red">
           <BarChart width={600} height={400} data={this.state.graphData}
                     margin={{top: 5, right: 30, left: 20, bottom: 100}}>
-            <XAxis dataKey='markets' angle={-45} textAnchor='end' interval={0}/>
+            <XAxis dataKey='vehicles' angle={-45} textAnchor='end' interval={0}/>
             <YAxis/>
             <CartesianGrid strokeDasharray="3 3"/>
             <Tooltip/>
-            <Bar dataKey="Kg" fill="#8884d8"/>
+            <Bar dataKey="load" fill="#8884d8"/>
+            <ReferenceLine y={100} label={'Sovraccarico (100%)'} stroke='red' isFront={true} alwaysShow={true}/>
+            <ReferenceLine y={85} label={'Soglia di allerta (85%)'} stroke='orange' isFront={true} alwaysShow={true}/>
           </BarChart>
         </Segment>
       </div>
@@ -95,20 +92,16 @@ class CollectGraph extends Component {
   }
 }
 
-const ALL_COLLECT_QUERY = gql`
-  query data {
-    allCollects {
-      supermarket {
-        id
-      }
-      loadedQty
-    }
-    allSupermarkets{
+const ALL_VEHICLES_QUERY = gql`
+  query getAllVehicles {
+    allVehicles {
       id
-      city
-      name
+      radioCode
+      actualLoad
+      tare
+      tmfl
     }
   }
 `
 
-export default graphql(ALL_COLLECT_QUERY)(CollectGraph)
+export default graphql(ALL_VEHICLES_QUERY)(VehicleLoadGraph)
