@@ -43,6 +43,12 @@ class VehicleLoadGraph extends Component {
     }
   }
 
+  componentDidMount() {
+    if (this.props.data.networkStatus === 7 && this.state.graphData.length === 0) {
+      this.setState({graphData: this.aggregateWithReduce(this.props.data.allVehicles)})
+    }
+  }
+
   render() {
 
     if (this.props.data && this.props.data.loading) {

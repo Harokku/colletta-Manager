@@ -4,8 +4,8 @@ import 'semantic-ui-css/semantic.min.css'
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import { ApolloProvider, createNetworkInterface, ApolloClient } from 'react-apollo'
-import { BrowserRouter } from 'react-router-dom'
+import {ApolloProvider, createNetworkInterface, ApolloClient} from 'react-apollo'
+import {BrowserRouter} from 'react-router-dom'
 
 
 const networkInterface = createNetworkInterface({
@@ -18,9 +18,9 @@ const client = new ApolloClient({
 
 
 ReactDOM.render(
- <BrowserRouter>
-   <ApolloProvider client={client}>
-    <App />
-  </ApolloProvider>
- </BrowserRouter>, document.getElementById('root'));
+  <ApolloProvider client={client}>
+    <BrowserRouter>
+      <App/>
+    </BrowserRouter>
+  </ApolloProvider>, document.getElementById('root'));
 registerServiceWorker();

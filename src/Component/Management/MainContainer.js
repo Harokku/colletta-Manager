@@ -3,7 +3,10 @@ import {Sidebar, Segment, Button, Menu, Icon} from 'semantic-ui-react'
 import {Link, Switch, Route} from 'react-router-dom'
 import {withRouter} from 'react-router'
 
+import './MainContainer.css'
+
 import GraphList from '../Graph/GraphsList'
+import Dashboard from './Dashboard'
 
 
 class MainContainer extends Component {
@@ -22,7 +25,7 @@ class MainContainer extends Component {
     return (
       <div>
         <Segment tertiary>
-          Colletta Manager
+          Colletta Management Console
         </Segment>
 
         <Button onClick={this.toggleVisibility}><Icon name='list layout'/> Menu</Button>
@@ -36,7 +39,7 @@ class MainContainer extends Component {
               </Link>
             </Menu.Item>
             <Menu.Item name='graphs'>
-              <Link to=''>
+              <Link to='/graphs'>
                 <Icon name='bar chart'/>
                 Grafici
               </Link>
@@ -70,7 +73,8 @@ class MainContainer extends Component {
           <Sidebar.Pusher>
             <Segment basic>
               <Switch>
-                <Route exact path='/' component={GraphList}/>
+                <Route exact path='/' component={Dashboard}/>
+                <Route exact path='/graphs' component={GraphList}/>
               </Switch>
             </Segment>
           </Sidebar.Pusher>

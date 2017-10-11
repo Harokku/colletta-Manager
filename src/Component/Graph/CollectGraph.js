@@ -48,6 +48,12 @@ class CollectGraph extends Component {
     }
   }
 
+  componentDidMount() {
+    if (this.props.data.networkStatus === 7 && this.state.graphData.length === 0) {
+      this.setState({graphData: this.aggregateWithReduce(this.props.data.allCollects, this.props.data.allSupermarkets)})
+    }
+  }
+
   render() {
 
     if (this.props.data && this.props.data.loading) {
