@@ -1,15 +1,20 @@
 import React from 'react'
-import { Header, Segment } from 'semantic-ui-react'
+import { Segment, Grid } from 'semantic-ui-react'
+import VehicleLoadGraph from '../Graph/VehicleLoadGraph'
+import Counters from './Counters';
 
 
 export default function Dashboard(props) {
   return (
     <div>
-      <Header as='h2' attached='top'>Segnaposto Dashboard</Header>
-      <Segment attached color='teal'>
-        Verra' vissualizzato un riassunto della situazione con stato carico mezzi,
-        totale caricato e altre informazioni utili.
+      <Segment>
+        <Counters/>
       </Segment>
+      <Grid columns={2}>
+        <Grid.Column>
+          <VehicleLoadGraph/>
+        </Grid.Column>
+      </Grid>
     </div>
   )
 }

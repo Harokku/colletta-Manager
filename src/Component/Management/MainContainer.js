@@ -7,6 +7,7 @@ import './MainContainer.css'
 
 import GraphList from '../Graph/GraphsList'
 import Dashboard from './Dashboard'
+import VehicleTable from '../Tables/VehicleTable'
 
 
 class MainContainer extends Component {
@@ -51,7 +52,7 @@ class MainContainer extends Component {
               </Link>
             </Menu.Item>
             <Menu.Item name='fleet'>
-              <Link to=''>
+              <Link to='/vehicles'>
                 <Icon name='truck'/>
                 Flotta
               </Link>
@@ -75,6 +76,7 @@ class MainContainer extends Component {
               <Switch>
                 <Route exact path='/' component={Dashboard}/>
                 <Route exact path='/graphs' component={GraphList}/>
+                <Route exact path='/vehicles' component={VehicleTable}/>
               </Switch>
             </Segment>
           </Sidebar.Pusher>

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {graphql, gql} from 'react-apollo'
-import {Dimmer, Loader, Segment} from 'semantic-ui-react'
-import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine} from 'recharts'
+import {Dimmer, Loader, Segment, Header, Icon} from 'semantic-ui-react'
+import {ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine} from 'recharts'
 
 class VehicleLoadGraph extends Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class VehicleLoadGraph extends Component {
         let newItem = {};
         newItem['id'] = currValue.id;
         newItem['vehicles'] = currValue.radioCode;
-        newItem['load'] = (currValue.actualLoad + currValue.tare) / currValue.tmfl * 100
+        newItem['load'] = Math.round((currValue.actualLoad + currValue.tare) / currValue.tmfl * 100);
         accumulator.push(newItem)
         return accumulator
       }, [])
@@ -51,7 +51,6 @@ class VehicleLoadGraph extends Component {
   render() {
 
     if (this.props.data && this.props.data.loading) {
-
       return (
         <Segment color="red">
           <Dimmer active>
@@ -80,17 +79,23 @@ class VehicleLoadGraph extends Component {
 
     return (
       <div>
-        <Segment color="red">
-          <BarChart width={600} height={400} data={this.state.graphData}
-                    margin={{top: 5, right: 30, left: 20, bottom: 100}}>
-            <XAxis dataKey='vehicles' angle={-45} textAnchor='end' interval={0}/>
-            <YAxis/>
-            <CartesianGrid strokeDasharray="3 3"/>
-            <Tooltip/>
-            <Bar dataKey="load" fill="#8884d8"/>
-            <ReferenceLine y={100} label={'Sovraccarico (100%)'} stroke='red' isFront={true} alwaysShow={true}/>
-            <ReferenceLine y={85} label={'Soglia di allerta (85%)'} stroke='orange' isFront={true} alwaysShow={true}/>
-          </BarChart>
+        <Header size='tiny' attached={'top'} as='h3' icon textAlign='center'>
+          <Icon size={'mini'} name='truck'/>
+          Carico Mezzi
+        </Header>
+        <Segment attached color="teal">
+          <ResponsiveContainer width='100%' height={350}>
+            <BarChart data={this.state.graphData}
+                      margin={{top: 5, right: 30, left: 20, bottom: 100}}>
+              <XAxis dataKey='vehicles' angle={-45} textAnchor='end' interval={0}/>
+              <YAxis/>
+              <CartesianGrid strokeDasharray="3 3"/>
+              <Tooltip/>
+              <Bar dataKey="load" fill="#8884d8"/>
+              <ReferenceLine y={100} label={'Sovraccarico (100%)'} stroke='red' isFront={true} alwaysShow={true}/>
+              <ReferenceLine y={85} label={'Soglia di allerta (85%)'} stroke='orange' isFront={true} alwaysShow={true}/>
+            </BarChart>
+          </ResponsiveContainer>
         </Segment>
       </div>
     );

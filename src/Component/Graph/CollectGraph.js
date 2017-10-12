@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {graphql, gql} from 'react-apollo'
-import {Dimmer, Loader, Segment} from 'semantic-ui-react'
-import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts'
+import {Dimmer, Loader, Segment, Header, Icon} from 'semantic-ui-react'
+import {ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts'
 
 class CollectGraph extends Component {
   constructor(props) {
@@ -18,7 +18,7 @@ class CollectGraph extends Component {
           let newItem = {};
           let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
           newItem['id'] = currValue.supermarket.id;
-          newItem['markets'] =  markets[marketIndex].city + ' - ' + markets[marketIndex].name
+          newItem['markets'] = markets[marketIndex].city + ' - ' + markets[marketIndex].name
           newItem['Kg'] = 0;
           accumulator.push(newItem)
         }
@@ -85,15 +85,21 @@ class CollectGraph extends Component {
 
     return (
       <div>
-        <Segment color="red">
-          <BarChart width={600} height={400} data={this.state.graphData}
-                    margin={{top: 5, right: 30, left: 20, bottom: 100}}>
-            <XAxis dataKey='markets' angle={-45} textAnchor='end' interval={0}/>
-            <YAxis/>
-            <CartesianGrid strokeDasharray="3 3"/>
-            <Tooltip/>
-            <Bar dataKey="Kg" fill="#8884d8"/>
-          </BarChart>
+        <Header size='tiny' attached={'top'} as='h3' icon textAlign='center'>
+          <Icon size={'mini'} name='shop'/>
+          Ritiri dai SuperMarket
+        </Header>
+        <Segment attached color="green">
+          <ResponsiveContainer width='100%' height={350}>
+            <BarChart data={this.state.graphData}
+                      margin={{top: 5, right: 30, left: 20, bottom: 100}}>
+              <XAxis dataKey='markets' angle={-45} textAnchor='end' interval={0}/>
+              <YAxis/>
+              <CartesianGrid strokeDasharray="3 3"/>
+              <Tooltip/>
+              <Bar dataKey="Kg" fill="#8884d8"/>
+            </BarChart>
+          </ResponsiveContainer>
         </Segment>
       </div>
     );
