@@ -1,59 +1,44 @@
 import React, {Component} from 'react'
 import {graphql, gql} from 'react-apollo'
-import {Segment, Dimmer, Loader, Table} from 'semantic-ui-react'
+import {Sidebar, Segment, Dimmer, Loader, Table} from 'semantic-ui-react'
+
+import VehicleCrew from './VehicleCrew'
+
 
 class VehicleTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedRow: ''
+      selectedCrew: null,
+      sideBarVisible: false,
     }
   }
 
-  // TODO: Refactor this to show attached table only if row is clicked
+  showSidebarCrew = (crew, e) => {
+    e.preventDefault();
+    this.setState({
+      selectedCrew: crew ? crew.personnels : null,
+      sideBarVisible: true
+    })
+  }
+
+  handleSidebarClose = () => {
+    this.setState({
+      sideBarVisible: false,
+    })
+  }
+
   tableBuilder = (data) => {
     return data.map((item) => {
       return (
-        <Table.Body>
         <Table.Row key={item.id}>
-          <Table.Cell>{item.radioCode}</Table.Cell>
-          <Table.Cell>{item.actualLoad}</Table.Cell>
+          <Table.Cell selectable><a onClick={(e) => this.showSidebarCrew(item.crew, e)}>{item.radioCode}</a></Table.Cell>
+          <Table.Cell>{Math.round((item.actualLoad + item.tare) / item.tmfl * 100)}</Table.Cell>
           <Table.Cell>{item.speed}</Table.Cell>
           <Table.Cell>{item.crew ? item.crew.shift : 'Nessun equipaggio'}</Table.Cell>
         </Table.Row>
-
-        </Table.Body>
       );
     })
-  };
-
-  tableCrewBuilder = () => {
-    return (
-      <Table attached='bottom'>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Cognome</Table.HeaderCell>
-            <Table.HeaderCell>Nome</Table.HeaderCell>
-            <Table.HeaderCell>Telefono</Table.HeaderCell>
-            <Table.HeaderCell>Ruolo</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell>Crenna</Table.Cell>
-            <Table.Cell>Simone</Table.Cell>
-            <Table.Cell>3214</Table.Cell>
-            <Table.Cell>Autista</Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>Speroni</Table.Cell>
-            <Table.Cell>Dugongo</Table.Cell>
-            <Table.Cell>3214</Table.Cell>
-            <Table.Cell>NAvigatore</Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table>
-    )
   };
 
   render() {
@@ -84,68 +69,37 @@ class VehicleTable extends Component {
     const vehiclesData = this.props.data.allVehicles;
 
     return (
-      <Table selectable striped attached='top'>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Codice Radio</Table.HeaderCell>
-            <Table.HeaderCell>% di carico</Table.HeaderCell>
-            <Table.HeaderCell>Velocita'</Table.HeaderCell>
-            <Table.HeaderCell>Turno</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
+      <Sidebar.Pushable as={Segment}>
+        <Sidebar
+          as={Segment}
+          animation='overlay'
+          direction='right'
+          visible={this.state.sideBarVisible}
+          width='very wide'
+        >
+          <VehicleCrew
+            crew={this.state.selectedCrew ? this.state.selectedCrew : ''}
+            onCloseClicked={this.handleSidebarClose}
+          />
+        </Sidebar>
 
+        <Sidebar.Pusher>
+          <Table celled striped attached='top'>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Codice Radio</Table.HeaderCell>
+                <Table.HeaderCell>% di carico</Table.HeaderCell>
+                <Table.HeaderCell>Velocita'</Table.HeaderCell>
+                <Table.HeaderCell>Turno</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
 
-          {this.tableBuilder(vehiclesData)}
-        {this.tableCrewBuilder()}
-
-
-
-        {/*<Table.Body>
-         <Table.Row>
-           <Table.Cell>1011</Table.Cell>
-           <Table.Cell>85</Table.Cell>
-           <Table.Cell>55</Table.Cell>
-           <Table.Cell>Mattina</Table.Cell>
-         </Table.Row>
-
-         <Table attached='bottom'>
-           <Table.Header>
-             <Table.Row>
-               <Table.HeaderCell>Cognome</Table.HeaderCell>
-               <Table.HeaderCell>Nome</Table.HeaderCell>
-               <Table.HeaderCell>Telefono</Table.HeaderCell>
-               <Table.HeaderCell>Ruolo</Table.HeaderCell>
-             </Table.Row>
-           </Table.Header>
-           <Table.Row>
-             <Table.Cell>Crenna</Table.Cell>
-             <Table.Cell>Simone</Table.Cell>
-             <Table.Cell>3214</Table.Cell>
-             <Table.Cell>Autista</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell>Speroni</Table.Cell>
-             <Table.Cell>Dugongo</Table.Cell>
-             <Table.Cell>3214</Table.Cell>
-             <Table.Cell>NAvigatore</Table.Cell>
-           </Table.Row>
-         </Table>
-
-         <Table.Row>
-           <Table.Cell>1011</Table.Cell>
-           <Table.Cell>85</Table.Cell>
-           <Table.Cell>55</Table.Cell>
-           <Table.Cell>Mattina</Table.Cell>
-         </Table.Row>
-         <Table.Row>
-           <Table.Cell>1011</Table.Cell>
-           <Table.Cell>85</Table.Cell>
-           <Table.Cell>55</Table.Cell>
-           <Table.Cell>Mattina</Table.Cell>
-         </Table.Row>
-       </Table.Body>*/}
-
-      </Table>
+            <Table.Body>
+              {this.tableBuilder(vehiclesData)}
+            </Table.Body>
+          </Table>
+        </Sidebar.Pusher>
+      </Sidebar.Pushable>
     )
   }
 }
