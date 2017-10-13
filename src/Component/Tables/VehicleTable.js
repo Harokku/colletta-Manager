@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {graphql, gql} from 'react-apollo'
-import {Sidebar, Segment, Dimmer, Loader, Table} from 'semantic-ui-react'
+import {Sidebar, Segment, Dimmer, Loader, Table, Label} from 'semantic-ui-react'
 
 import VehicleCrew from './VehicleCrew'
 
@@ -10,20 +10,23 @@ class VehicleTable extends Component {
     super(props);
     this.state = {
       selectedCrew: null,
+      selectedRow: null,
       sideBarVisible: false,
     }
   }
 
-  showSidebarCrew = (crew, e) => {
+  showSidebarCrew = (crew, id, e) => {
     e.preventDefault();
     this.setState({
       selectedCrew: crew ? crew.personnels : null,
+      selectedRow: id,
       sideBarVisible: true
     })
   }
 
   handleSidebarClose = () => {
     this.setState({
+      selectedRow: null,
       sideBarVisible: false,
     })
   }
@@ -32,7 +35,12 @@ class VehicleTable extends Component {
     return data.map((item) => {
       return (
         <Table.Row key={item.id}>
-          <Table.Cell selectable><a onClick={(e) => this.showSidebarCrew(item.crew, e)}>{item.radioCode}</a></Table.Cell>
+          <Table.Cell selectable>
+            {item.id === this.state.selectedRow
+              ? <Label ribbon color='black'>{item.radioCode}</Label>
+              : <a onClick={(e) => this.showSidebarCrew(item.crew, item.id, e)}>{item.radioCode}</a>
+            }
+          </Table.Cell>
           <Table.Cell>{Math.round((item.actualLoad + item.tare) / item.tmfl * 100)}</Table.Cell>
           <Table.Cell>{item.speed}</Table.Cell>
           <Table.Cell>{item.crew ? item.crew.shift : 'Nessun equipaggio'}</Table.Cell>
@@ -84,7 +92,7 @@ class VehicleTable extends Component {
         </Sidebar>
 
         <Sidebar.Pusher>
-          <Table celled striped attached='top'>
+          <Table celled striped>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Codice Radio</Table.HeaderCell>
@@ -119,6 +127,7 @@ const ALL_VEHICLES_QUERY = gql`
           surname
           name
           phone
+          role
         }
       }
     }
