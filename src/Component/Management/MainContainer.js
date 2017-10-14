@@ -8,6 +8,7 @@ import './MainContainer.css'
 import GraphList from '../Graph/GraphsList'
 import Dashboard from './Dashboard'
 import VehicleTable from '../Tables/VehicleTable'
+import MapOverview from '../Map/MapOverview'
 
 
 class MainContainer extends Component {
@@ -64,7 +65,7 @@ class MainContainer extends Component {
               </Link>
             </Menu.Item>
             <Menu.Item name='map'>
-              <Link to=''>
+              <Link to='/map'>
                 <Icon name='map'/>
                 Mappa
               </Link>
@@ -77,6 +78,7 @@ class MainContainer extends Component {
                 <Route exact path='/' component={Dashboard}/>
                 <Route exact path='/graphs' component={GraphList}/>
                 <Route exact path='/vehicles' component={VehicleTable}/>
+                <Route exact path='/map' component={MapOverview}/>
               </Switch>
             </Segment>
           </Sidebar.Pusher>
