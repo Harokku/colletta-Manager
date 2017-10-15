@@ -17,7 +17,7 @@ class VehicleLoadGraph extends Component {
         let newItem = {};
         newItem['id'] = currValue.id;
         newItem['vehicles'] = currValue.radioCode;
-        newItem['load'] = Math.round((currValue.actualLoad + currValue.tare) / currValue.tmfl * 100);
+        newItem['load'] = Math.round(currValue.actualLoad / (currValue.tmfl - currValue.tare) * 100);
         accumulator.push(newItem)
         return accumulator
       }, [])

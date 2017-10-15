@@ -3,6 +3,7 @@ import {graphql, gql} from 'react-apollo'
 import {Sidebar, Segment, Dimmer, Loader, Table, Label} from 'semantic-ui-react'
 
 import VehicleCrew from './VehicleCrew'
+import VehicleFormNew from './VehicleFormNew'
 
 
 class VehicleTable extends Component {
@@ -12,6 +13,13 @@ class VehicleTable extends Component {
       selectedCrew: null,
       selectedRow: null,
       sideBarVisible: false,
+      newVehicle: {
+        radioCode: '',
+        manufacturer: '',
+        model: '',
+        tmfl: '',
+        tare: '',
+      },
     }
   }
 
@@ -31,6 +39,16 @@ class VehicleTable extends Component {
     })
   }
 
+  // TODO: Implement change and mutation
+  handleNewVehicleFormChange = (formData, name, value) => {
+   this.setState(prevStare => ({
+     newVehicle: {
+       ...prevStare.newVehicle,
+       [name]: value,
+     }
+   }))
+  }
+
   tableBuilder = (data) => {
     return data.map((item) => {
       return (
@@ -41,7 +59,7 @@ class VehicleTable extends Component {
               : <a onClick={(e) => this.showSidebarCrew(item.crew, item.id, e)}>{item.radioCode}</a>
             }
           </Table.Cell>
-          <Table.Cell>{Math.round((item.actualLoad + item.tare) / item.tmfl * 100)}</Table.Cell>
+          <Table.Cell>{Math.round(item.actualLoad / (item.tmfl - item.tare) * 100)}</Table.Cell>
           <Table.Cell>{item.speed}</Table.Cell>
           <Table.Cell>{item.crew ? item.crew.shift : 'Nessun equipaggio'}</Table.Cell>
         </Table.Row>
@@ -106,6 +124,9 @@ class VehicleTable extends Component {
               {this.tableBuilder(vehiclesData)}
             </Table.Body>
           </Table>
+
+          <VehicleFormNew formData={this.state.newVehicle} onFormDataChange={this.handleNewVehicleFormChange}/>
+
         </Sidebar.Pusher>
       </Sidebar.Pushable>
     )
