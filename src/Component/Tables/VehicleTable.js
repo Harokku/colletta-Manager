@@ -26,7 +26,7 @@ class VehicleTable extends Component {
   showSidebarCrew = (crew, id, e) => {
     e.preventDefault();
     this.setState({
-      selectedCrew: crew ? crew.personnels : null,
+      selectedCrew: crew.length > 0 ? crew : null,
       selectedRow: id,
       sideBarVisible: true
     })
@@ -39,29 +39,23 @@ class VehicleTable extends Component {
     })
   }
 
-  // TODO: Implement change and mutation
-  handleNewVehicleFormChange = (formData, name, value) => {
-   this.setState(prevStare => ({
-     newVehicle: {
-       ...prevStare.newVehicle,
-       [name]: value,
-     }
-   }))
-  }
-
   tableBuilder = (data) => {
     return data.map((item) => {
       return (
         <Table.Row key={item.id}>
-          <Table.Cell selectable>
+          <Table.Cell>
             {item.id === this.state.selectedRow
               ? <Label ribbon color='black'>{item.radioCode}</Label>
-              : <a onClick={(e) => this.showSidebarCrew(item.crew, item.id, e)}>{item.radioCode}</a>
+              : item.radioCode
             }
           </Table.Cell>
           <Table.Cell>{Math.round(item.actualLoad / (item.tmfl - item.tare) * 100)}</Table.Cell>
           <Table.Cell>{item.speed}</Table.Cell>
-          <Table.Cell>{item.crew ? item.crew.shift : 'Nessun equipaggio'}</Table.Cell>
+          <Table.Cell selectable>{item.crews.length > 0
+            ? <a onClick={(e) => this.showSidebarCrew(item.crews, item.id, e)}>Mostra equipaggi</a>
+            : <b>'Nessun equipaggio'</b>
+          }
+            </Table.Cell>
         </Table.Row>
       );
     })
@@ -101,10 +95,10 @@ class VehicleTable extends Component {
           animation='overlay'
           direction='right'
           visible={this.state.sideBarVisible}
-          width='very wide'
+          width='wide'
         >
           <VehicleCrew
-            crew={this.state.selectedCrew ? this.state.selectedCrew : ''}
+            crews={this.state.selectedCrew ? this.state.selectedCrew : []}
             onCloseClicked={this.handleSidebarClose}
           />
         </Sidebar>
@@ -125,7 +119,7 @@ class VehicleTable extends Component {
             </Table.Body>
           </Table>
 
-          <VehicleFormNew formData={this.state.newVehicle} onFormDataChange={this.handleNewVehicleFormChange}/>
+          <VehicleFormNew/>
 
         </Sidebar.Pusher>
       </Sidebar.Pushable>
@@ -142,7 +136,7 @@ const ALL_VEHICLES_QUERY = gql`
       tare
       tmfl
       speed
-      crew {
+      crews {
         shift
         personnels {
           surname

@@ -1,5 +1,8 @@
 import React from 'react'
-import {Card, Icon, Button, List, Label} from 'semantic-ui-react'
+import PropTypes from 'prop-types'
+import {Card, Icon, Button, List, Label, Divider} from 'semantic-ui-react'
+
+import ribbonColor from '../Functions/RibbonColor'
 
 function listCard(props) {
   return (
@@ -11,42 +14,40 @@ function listCard(props) {
         </Card.Header>
       </Card.Content>
       <Card.Content>
-          {props.crew ? listCrew(props.crew) : ''}
+        {props.crews.length > 0 ? listCrew(props.crews) : ''}
       </Card.Content>
     </Card>
   )
 }
 
-function listCrew(crew) {
-  return crew.map((item, index) => {
-      return (
-        <List key={index}>
-          <Label color={ribbonColor(item.role)} ribbon>{item.role}</Label>
-          <List.Item>Nome: {item.surname + ' ' + item.name}</List.Item>
-          <List.Item>Nome: {item.phone}</List.Item>
-        </List>
-      )
+function listCrew(crews) {
+  return crews.map((item, index) => {
+    return (
+      <List key={index}>
+        <Label>{item.shift}</Label>
+        <Divider/>
+        {item.personnels.map((personnel, index) => {
+          return (
+            <div key={index}>
+              <Label color={ribbonColor(personnel.role)} ribbon>{personnel.role}</Label>
+              <List.Item>Nome: {personnel.surname + ' ' + personnel.name}</List.Item>
+              <List.Item>Nome: {personnel.phone}</List.Item>
+            </div>
+          )
+        })}
+      </List>
+    )
   })
 }
 
-function ribbonColor(role) {
-  if (role === 'COORDINAMENTO'){
-    return 'red'
-  } else if (role === 'AUTISTA'){
-    return 'green'
-  } else if (role === 'NAVIGATORE'){
-    return 'blue'
-  } else if (role === 'OPMARKET'){
-    return 'brown'
-  } else {
-    return 'black'
-  }
+export default function VehicleCrew(props) {
+  return (
+    <Card.Group>
+      {listCard(props)}
+    </Card.Group>
+  )
 }
 
-export default function VehicleCrew(props) {
-    return (
-      <Card.Group>
-        {listCard(props)}
-      </Card.Group>
-    )
+VehicleCrew.propTypes = {
+  crews: PropTypes.array.isRequired
 }

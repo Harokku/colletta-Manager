@@ -9,7 +9,7 @@ import GraphList from '../Graph/GraphsList'
 import Dashboard from './Dashboard'
 import VehicleTable from '../Tables/VehicleTable'
 import MapOverview from '../Map/MapOverview'
-
+import CrewList from '../Crew/CrewList'
 
 class MainContainer extends Component {
   constructor(props) {
@@ -58,8 +58,8 @@ class MainContainer extends Component {
                 Flotta
               </Link>
             </Menu.Item>
-            <Menu.Item name='users'>
-              <Link to=''>
+            <Menu.Item name='crew'>
+              <Link to='/crew'>
                 <Icon name='users'/>
                 Personale
               </Link>
@@ -78,6 +78,7 @@ class MainContainer extends Component {
                 <Route exact path='/' component={Dashboard}/>
                 <Route exact path='/graphs' component={GraphList}/>
                 <Route exact path='/vehicles' component={VehicleTable}/>
+                <Route exact path='/crew' component={CrewList}/>
                 <Route exact path='/map' component={MapOverview}/>
               </Switch>
             </Segment>
