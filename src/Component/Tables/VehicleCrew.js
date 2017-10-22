@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Card, Icon, Button, List, Label, Divider} from 'semantic-ui-react'
+import {Card, Icon, Button, Label} from 'semantic-ui-react'
 
-import ribbonColor from '../Functions/RibbonColor'
+import {ribbonColor, shiftColor} from '../Functions/RibbonColor'
 
 function listCard(props) {
   return (
@@ -13,9 +13,7 @@ function listCard(props) {
           Equipaggio
         </Card.Header>
       </Card.Content>
-      <Card.Content>
         {props.crews.length > 0 ? listCrew(props.crews) : ''}
-      </Card.Content>
     </Card>
   )
 }
@@ -23,19 +21,25 @@ function listCard(props) {
 function listCrew(crews) {
   return crews.map((item, index) => {
     return (
-      <List key={index}>
-        <Label>{item.shift}</Label>
-        <Divider/>
+      <Card.Content key={index}>
+        <Label pointing='below' color={shiftColor(item.shift)}>{item.shift}</Label>
         {item.personnels.map((personnel, index) => {
           return (
             <div key={index}>
               <Label color={ribbonColor(personnel.role)} ribbon>{personnel.role}</Label>
-              <List.Item>Nome: {personnel.surname + ' ' + personnel.name}</List.Item>
-              <List.Item>Nome: {personnel.phone}</List.Item>
+              <br/>
+              <Label color='blue' image basic>
+                Nome:<Label.Detail>{personnel.surname} {personnel.name}</Label.Detail>
+              </Label>
+              <br/>
+              <Label as='a' color='teal' image basic>
+                Tel:<Label.Detail><a href={'tel:'+personnel.phone}>{personnel.phone}</a></Label.Detail>
+              </Label>
+              <br/>
             </div>
           )
         })}
-      </List>
+      </Card.Content>
     )
   })
 }

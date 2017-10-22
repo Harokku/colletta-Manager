@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {Card, Label} from 'semantic-ui-react'
 
-import ribbonColor from '../Functions/RibbonColor'
+import {ribbonColor, shiftColor} from '../Functions/RibbonColor'
 
 
 export default class CrewCard extends Component {
@@ -14,17 +14,17 @@ export default class CrewCard extends Component {
       <Card.Content key={personnel.id}>
         <Label color={ribbonColor(personnel.role)} ribbon>{personnel.role}</Label>
         <br/>
-        <Label color='brown'>
+        <Label color='blue' image basic>
           Nome:<Label.Detail>{personnel.surname} {personnel.name}</Label.Detail>
         </Label>
         <br/>
-        <Label color='teal'>
-          Tel:<Label.Detail>{personnel.phone}</Label.Detail>
+        <Label as='a' color='teal' image basic>
+          Tel:<Label.Detail><a href={'tel:'+personnel.phone}>{personnel.phone}</a></Label.Detail>
         </Label>
         <br/>
         {personnel.isDriver
-          ? <Label color='olive'>Puo guidare</Label>
-          : <Label color='grey'>Non Puo guidare</Label>}
+          ? <Label color='green' image>Puo guidare</Label>
+          : <Label color='red' image>Non Puo guidare</Label>}
       </Card.Content>
       )
     })
@@ -33,7 +33,7 @@ export default class CrewCard extends Component {
       <Card raised>
         <Card.Content>
           <Card.Header>
-            Turno: {this.props.shift}
+            Turno: <Label tag color={shiftColor(this.props.shift)}>{this.props.shift}</Label>
           </Card.Header>
         </Card.Content>
         {personnel}
