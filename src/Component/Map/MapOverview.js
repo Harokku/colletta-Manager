@@ -50,6 +50,7 @@ const ALL_MAP_DATA = gql`
           latitude
           longitude
           isClosed
+          icon
       }
       allVehicles {
           id

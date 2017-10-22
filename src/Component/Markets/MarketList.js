@@ -4,6 +4,8 @@ import MarketsMap from './MarketsMap'
 import {Segment, Loader, Dimmer} from 'semantic-ui-react'
 import {graphql, gql} from 'react-apollo'
 
+import './MarketList.css'
+
 class MarketList extends Component {
   constructor(props) {
     super(props);
@@ -51,7 +53,6 @@ class MarketList extends Component {
 
     const marketsData = this.props.data.allSupermarkets;
 
-    // TODO: Implement GeoCoding for address translation
     const marketsList = marketsData.map(market => {
       return (
         <Table.Row key={market.id}>
@@ -68,7 +69,7 @@ class MarketList extends Component {
                            market.isClosed,
                            e)}>{market.address}</a>
           </Table.Cell>
-          <Table.Cell>{market.managerPhone}</Table.Cell>
+          <Table.Cell><a href={'tel:'+market.managerPhone}>{market.managerPhone}</a></Table.Cell>
           <Table.Cell>{market.isClosed ? 'Gia chiuso' : 'Ancora aperto'}</Table.Cell>
         </Table.Row>
       )
@@ -76,6 +77,7 @@ class MarketList extends Component {
 
     return (
       <div>
+        <div className='scrollTable'>
         <Table selectable>
           <Table.Header>
             <Table.Row>
@@ -91,6 +93,7 @@ class MarketList extends Component {
             {marketsList}
           </Table.Body>
         </Table>
+        </div>
 
         <Divider/>
 

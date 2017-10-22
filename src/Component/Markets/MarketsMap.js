@@ -33,11 +33,11 @@ export default class MarketsMap extends Component {
       if (this.marker !== null) {
         this.marker.remove(this.el)
       }
-      this.el.flyTo(this.props.marketCoords, 15)
+      this.el.flyTo(this.props.marketCoords, 16)
       const markMarker = L.ExtraMarkers.icon({
         icon: 'fa-shopping-cart',
-        markerColor: this.props.isClosed ? 'red' : 'green',
-        iconColor: 'blue',
+        markerColor: this.props.isClosed ? 'orange-dark' : 'blue-dark',
+        iconColor: 'white',
         shape: 'square',
         prefix: 'fa'
       })

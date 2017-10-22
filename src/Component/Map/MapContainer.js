@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import VehicleMarker from './VehicleMarker'
+import MarketMarker from './MarketMarker'
 
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet/dist/leaflet'
@@ -37,6 +38,16 @@ export default class MapContainer extends Component {
     }
   };
 
+  plotMarkets = () => {
+    if (this.props.markets) {
+      return this.props.markets.map(market => {
+        return (
+          <MarketMarker key={market.id} market={market} mapElement={this.el}/>
+        )
+      })
+    }
+  }
+
   componentDidUpdate (prevProps) {
     if (prevProps !== this.props.vehicles){
       this.plotVehicles();
@@ -44,7 +55,7 @@ export default class MapContainer extends Component {
   }
 
   componentDidMount () {
-    this.el = L.map('overviewMap').setView([45.8518, 8.7561], 10)
+    this.el = L.map('overviewMap').setView([45.8518, 8.7561], 11)
     this.initializeMap()
   }
 
@@ -56,6 +67,7 @@ export default class MapContainer extends Component {
 
         </div>
         {this.plotVehicles()}
+        {this.plotMarkets()}
       </div>
     )
   }

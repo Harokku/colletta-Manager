@@ -13,15 +13,29 @@ export default class VehicleMarker extends Component {
 
   plotVehicle = () => {
     const markerIcon = L.ExtraMarkers.icon({
+      extraClasses: 'fa-3x',
       icon: 'fa-' + this.props.vehicle.icon.toLowerCase(),
-      markerColor: 'olivedrab',
-      iconColor: 'blue',
+      markerColor: this.colorOnPercent(),
+      iconColor: 'white',
       shape: 'circle',
       prefix: 'fa',
     });
-    this.marker = L.marker([this.props.vehicle.latitude, this.props.vehicle.longitude], {icon: markerIcon}).addTo(this.props.mapElement)
+    this.marker = L.marker([this.props.vehicle.latitude, this.props.vehicle.longitude],
+      {icon: markerIcon}).addTo(this.props.mapElement)
     this.marker.bindPopup(this.props.vehicle.radioCode)
   };
+
+  colorOnPercent = () => {
+    const {actualLoad, tmfl, tare} = this.props.vehicle;
+    const loadPerCent = actualLoad / (tmfl - tare) * 100;
+    if (loadPerCent <= 85) {
+      return 'green'
+    } else if (loadPerCent <= 100) {
+      return 'yellow'
+    } else {
+      return 'red'
+    }
+  }
 
   componentDidUpdate(prevProps) {
     if (prevProps.mapElement !== this.props.mapElement && this.props.mapElement !== null) {
