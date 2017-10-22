@@ -6,9 +6,6 @@ import ribbonColor from '../Functions/RibbonColor'
 
 
 export default class CrewCard extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
 

@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import {Table, Divider} from 'semantic-ui-react'
 import MarketsMap from './MarketsMap'
 import {Segment, Loader, Dimmer} from 'semantic-ui-react'
-
 import {graphql, gql} from 'react-apollo'
 
 class MarketList extends Component {
@@ -10,15 +9,18 @@ class MarketList extends Component {
     super(props);
     this.state = {
       selectedMarketCoords: [45.796889, 8.846316],
-      selectedMarketName: ''
+      selectedMarketName: '',
+      selectedMarketStatus: false,
     }
   }
 
-  flyToMarket = (coords, name, e) => {
+  flyToMarket = (coords, name, status, e) => {
     e.preventDefault();
+
     this.setState({
       selectedMarketCoords: coords,
       selectedMarketName: name,
+      selectedMarketStatus: status,
     })
   };
 
@@ -48,12 +50,24 @@ class MarketList extends Component {
     }
 
     const marketsData = this.props.data.allSupermarkets;
+
+    // TODO: Implement GeoCoding for address translation
     const marketsList = marketsData.map(market => {
       return (
         <Table.Row key={market.id}>
           <Table.Cell>{market.city}</Table.Cell>
-          <Table.Cell>{market.name}</Table.Cell>
-          <Table.Cell><a href='' onClick={(e) => this.flyToMarket([46.796889, 9.846316], market.city + ' - ' + market.name, e)}>{market.address}</a></Table.Cell>
+          <Table.Cell><a href=''
+                         onClick={(e) => this.flyToMarket([market.latitude, market.longitude],
+                           market.city + ' - ' + market.name,
+                           market.isClosed,
+                           e)}>{market.name}</a>
+          </Table.Cell>
+          <Table.Cell><a href=''
+                         onClick={(e) => this.flyToMarket([market.latitude, market.longitude],
+                           market.city + ' - ' + market.name,
+                           market.isClosed,
+                           e)}>{market.address}</a>
+          </Table.Cell>
           <Table.Cell>{market.managerPhone}</Table.Cell>
           <Table.Cell>{market.isClosed ? 'Gia chiuso' : 'Ancora aperto'}</Table.Cell>
         </Table.Row>
@@ -80,7 +94,8 @@ class MarketList extends Component {
 
         <Divider/>
 
-        <MarketsMap marketCoords={this.state.selectedMarketCoords} marketName={this.state.selectedMarketName}/>
+        <MarketsMap marketCoords={this.state.selectedMarketCoords} marketName={this.state.selectedMarketName}
+                    isClosed={this.state.selectedMarketStatus}/>
       </div>
     )
   }
@@ -95,6 +110,8 @@ const GET_ALL_MARKETS = gql`
             address
             isClosed
             managerPhone
+            latitude
+            longitude
         }
     }
 `

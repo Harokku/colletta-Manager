@@ -1,39 +1,67 @@
 import React, {Component} from 'react'
-import {Map, TileLayer, Marker, Popup} from 'react-leaflet'
+import {Segment, Loader, Dimmer} from 'semantic-ui-react'
+import {graphql, gql} from 'react-apollo'
+import MapContainer from './MapContainer'
 
-import './MapOverview.css'
-
-const DEFAULT_VIEWPORT = {
-  lat: 51.505,
-  lng: -0.09,
-  zoom: 13,
-}
-
-export default class MapOverview extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      viewport: DEFAULT_VIEWPORT,
-      lat: 45.83279,
-      lng: 8.80027,
-      zoom: 16,
-    }
-  }
+class MapOverview extends Component {
 
   render() {
-    const position = [this.state.lat, this.state.lng];
+
+    if (this.props.data && this.props.data.loading) {
+      return (
+        <Segment color="red">
+          <Dimmer active>
+            <Loader
+              indeterminate={true}
+            >
+              Waiting for your data to arrive
+            </Loader>
+          </Dimmer>
+        </Segment>
+      )
+    }
+
+    // 2
+    if (this.props.data && this.props.data.error) {
+      return (
+        <div>
+          <Segment color="red">Error retrieving data</Segment>
+        </div>
+      )
+    }
+
+    const marketsData = this.props.data.allSupermarkets;
+    const vehiclesData = this.props.data.allVehicles;
+
     return (
-      <Map center={position} zoom={this.state.zoom}>
-        <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-        />
-        <Marker position={position}>
-          <Popup>
-            <span>Centrale di Coordinamento Ritiro Pacchi. <br/> Yo da Fuck!</span>
-          </Popup>
-        </Marker>
-      </Map>
+      <div>
+        <MapContainer markets={marketsData} vehicles={vehiclesData}/>
+      </div>
     )
   }
 }
+
+const ALL_MAP_DATA = gql`
+  query allMarketData {
+      allSupermarkets {
+          id
+          city
+          name
+          latitude
+          longitude
+          isClosed
+      }
+      allVehicles {
+          id
+          radioCode
+          latitude
+          longitude
+          icon
+          actualLoad
+          tare
+          tmfl
+      }
+  }
+`
+
+export default graphql(ALL_MAP_DATA)(MapOverview)

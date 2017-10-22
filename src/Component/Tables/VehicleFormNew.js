@@ -99,6 +99,8 @@ const ADD_VEHICLE_MUTATION = gql`
             tmfl: $tmfl
             tare: $tare
             actualLoad: 0
+            latitude: 45.83341
+            longitude: 8.80055
             collects: {
                 tripNumber: 1
                 loadedQty: 0
