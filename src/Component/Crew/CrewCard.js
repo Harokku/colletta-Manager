@@ -16,7 +16,18 @@ export default class CrewCard extends Component {
       return (
       <Card.Content key={personnel.id}>
         <Label color={ribbonColor(personnel.role)} ribbon>{personnel.role}</Label>
-
+        <br/>
+        <Label color='brown'>
+          Nome:<Label.Detail>{personnel.surname} {personnel.name}</Label.Detail>
+        </Label>
+        <br/>
+        <Label color='teal'>
+          Tel:<Label.Detail>{personnel.phone}</Label.Detail>
+        </Label>
+        <br/>
+        {personnel.isDriver
+          ? <Label color='olive'>Puo guidare</Label>
+          : <Label color='grey'>Non Puo guidare</Label>}
       </Card.Content>
       )
     })

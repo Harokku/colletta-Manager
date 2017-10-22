@@ -10,6 +10,7 @@ import Dashboard from './Dashboard'
 import VehicleTable from '../Tables/VehicleTable'
 import MapOverview from '../Map/MapOverview'
 import CrewList from '../Crew/CrewList'
+import MarketList from '../Markets/MarketList'
 
 class MainContainer extends Component {
   constructor(props) {
@@ -47,7 +48,7 @@ class MainContainer extends Component {
               </Link>
             </Menu.Item>
             <Menu.Item name='supermarkets'>
-              <Link to=''>
+              <Link to='/markets'>
                 <Icon name='shop'/>
                 SuperMarkets
               </Link>
@@ -77,6 +78,7 @@ class MainContainer extends Component {
               <Switch>
                 <Route exact path='/' component={Dashboard}/>
                 <Route exact path='/graphs' component={GraphList}/>
+                <Route exact path='/markets' component={MarketList}/>
                 <Route exact path='/vehicles' component={VehicleTable}/>
                 <Route exact path='/crew' component={CrewList}/>
                 <Route exact path='/map' component={MapOverview}/>

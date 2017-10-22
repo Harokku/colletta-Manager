@@ -138,7 +138,7 @@ const ALL_VEHICLES_QUERY = gql`
       speed
       crews {
         shift
-        personnels {
+        personnels (orderBy: role_ASC) {
           surname
           name
           phone

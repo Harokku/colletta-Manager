@@ -10,7 +10,7 @@ export default class CrewListItem extends Component {
 
   render() {
     return (
-      <List.Item active={this.props.selectedId === this.props.id} onClick={this.handleClickEvent}>
+      <List.Item className='crewFull' active={this.props.selectedId === this.props.id} onClick={this.handleClickEvent}>
         <Image avatar>
           <Icon size='large' name={this.props.icon.toLowerCase()}/>
         </Image>

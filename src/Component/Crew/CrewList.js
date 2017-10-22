@@ -24,7 +24,6 @@ class CrewList extends Component {
     const filteredVehicle = data.filter(el => {
       return el.id === this.state.selectedVehicle
     });
-    console.log(filteredVehicle);
     return filteredVehicle[0] ? filteredVehicle[0].crews.map(crew => {
       return <CrewCard key={crew.id} shift={crew.shift} crewID={crew.id} personnels={crew.personnels}/>
     }) : ''
@@ -56,6 +55,7 @@ class CrewList extends Component {
     }
 
     const crewData = this.props.data.allVehicles;
+    // TODO: Implement crew completness validator
     const listItems = crewData.map(vehicle =>
       <CrewListItem onItemClick={this.handleListClick} key={vehicle.id} id={vehicle.id}
                     selectedId={this.state.selectedVehicle} icon={vehicle.icon.toLowerCase()}
@@ -90,7 +90,7 @@ const GET_ALL_CREW = gql`
             crews{
                 id
                 shift
-                personnels{
+                personnels (orderBy: role_ASC) {
                     id
                     surname
                     name
