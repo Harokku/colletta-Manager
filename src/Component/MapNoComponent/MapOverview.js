@@ -5,6 +5,44 @@ import MapContainer from './MapContainer'
 
 class MapOverview extends Component {
 
+  subscribeToNewMarketsAndVehicles = () => {
+    this.props.data.subscribeToMore({
+      document: gql`
+        subscription {
+            Supermarket(filter: {
+                mutation_in: [CREATED]
+            }) {
+                node {
+                    id
+                    city
+                    name
+                    latitude
+                    longitude
+                    isClosed
+                    icon
+                }
+            }
+        }
+      `,
+      updateQuery: (previous, {subscriptionData}) => {
+        const newAllMarkets = [
+          subscriptionData.data.Supermarket.node,
+          ...previous.allSupermarkets
+        ]
+        const result = {
+          ...previous,
+          allSupermarkets: newAllMarkets
+        }
+        return result
+      }
+    })
+  };
+
+  componentDidMount() {
+    this.subscribeToNewMarketsAndVehicles()
+  }
+
+
   render() {
 
     if (this.props.data && this.props.data.loading) {

@@ -1,79 +1,132 @@
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import VehicleMarker from './VehicleMarker'
-import MarketMarker from './MarketMarker'
-
+import {graphql, gql} from 'react-apollo'
+import {Segment, Dimmer, Loader} from 'semantic-ui-react'
+import {Map, TileLayer, Marker} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import L from 'leaflet/dist/leaflet'
+import 'leaflet/dist/leaflet'
+import './MapContainer.css'
+import {MarketMarkerBuilder, VehicleMarkerBuilder} from './MarkerBuilder'
 
-import './MapOverview.css'
-
-
-export default class MapContainer extends Component {
+class MapContainer extends Component {
   constructor(props) {
     super(props);
-    this.el = null;
     this.state = {
-      el: null,
+      lat: 45.8518,
+      lon: 8.7561,
+      zoom: 11,
     }
   }
 
-  initializeMap = () => {
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 18,
-    }).addTo(this.el);
-    this.setState({
-      el: this.el,
+  subscribeToNewMarketsAndVehicles = () => {
+    this.props.data.subscribeToMore({
+      document: gql`
+          subscription {
+              Supermarket(filter: {
+                  mutation_in: [CREATED]
+              }) {
+                  node {
+                      id
+                      city
+                      name
+                      latitude
+                      longitude
+                      isClosed
+                      icon
+                  }
+              }
+          }
+      `,
+      updateQuery: (previous, {subscriptionData}) => {
+        const newAllMarkets = [
+          subscriptionData.data.Supermarket.node,
+          ...previous.allSupermarkets
+        ]
+        const result = {
+          ...previous,
+          allSupermarkets: newAllMarkets
+        }
+        return result
+      }
     })
   };
 
-  plotVehicles = () => {
-    if (this.props.vehicles) {
-      return this.props.vehicles.map(vehicle => {
-        return (
-          <VehicleMarker key={vehicle.id} vehicle={vehicle} mapElement={this.el}/>
-        )
-      })
-    }
-  };
-
-  plotMarkets = () => {
-    if (this.props.markets) {
-      return this.props.markets.map(market => {
-        return (
-          <MarketMarker key={market.id} market={market} mapElement={this.el}/>
-        )
-      })
-    }
+  componentDidMount() {
+    this.subscribeToNewMarketsAndVehicles()
   }
 
-  componentDidUpdate (prevProps) {
-    if (prevProps !== this.props.vehicles){
-      this.plotVehicles();
-    }
-  }
-
-  componentDidMount () {
-    this.el = L.map('overviewMap').setView([45.8518, 8.7561], 11)
-    this.initializeMap()
-  }
-
-  // TODO: Implement markets plot function
   render() {
+
+    if (this.props.data && this.props.data.loading) {
+      return (
+        <Segment color="red">
+          <Dimmer active>
+            <Loader
+              indeterminate={true}
+            >
+              Waiting for your data to arrive
+            </Loader>
+          </Dimmer>
+        </Segment>
+      )
+    }
+
+    // 2
+    if (this.props.data && this.props.data.error) {
+      return (
+        <div>
+          <Segment color="red">Error retrieving data</Segment>
+        </div>
+      )
+    }
+
+    const marketsData = this.props.data.allSupermarkets;
+    const vehiclesData = this.props.data.allVehicles;
+
+    const mapMarketMarkers = marketsData.map(market => {
+      return <Marker key={market.id} position={[market.latitude, market.longitude]} icon={MarketMarkerBuilder(market)}/>
+    });
+
+    const mapVehicleMarkers = vehiclesData.map(vehicle => {
+      return <Marker key={vehicle.id} position={[vehicle.latitude, vehicle.longitude]} icon={VehicleMarkerBuilder(vehicle)}/>
+    });
+
+    const position =  [this.state.lat, this.state.lon]
     return (
       <div>
-        <div id='overviewMap'>
-
-        </div>
-        {this.plotVehicles()}
-        {this.plotMarkets()}
+      <Map center={position} zoom={this.state.zoom}>
+        <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                   attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+        />
+        {mapMarketMarkers}
+        {mapVehicleMarkers}
+      </Map>
       </div>
     )
   }
 }
 
-MapContainer.propTypes = {
-  markets: PropTypes.array.isRequired,
-  vehicles: PropTypes.array.isRequired,
-};
+const ALL_MAP_DATA = gql`
+    query allMarketData {
+        allSupermarkets {
+            id
+            city
+            name
+            latitude
+            longitude
+            isClosed
+            icon
+        }
+        allVehicles {
+            id
+            radioCode
+            latitude
+            longitude
+            icon
+            actualLoad
+            tare
+            tmfl
+        }
+    }
+`
+
+export default graphql(ALL_MAP_DATA)(MapContainer)

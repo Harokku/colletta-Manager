@@ -8,7 +8,7 @@ import './MainContainer.css'
 import GraphList from '../Graph/GraphsList'
 import Dashboard from './Dashboard'
 import VehicleTable from '../Tables/VehicleTable'
-import MapOverview from '../Map/MapOverview'
+import MapContainer from '../Map/MapContainer'
 import CrewList from '../Crew/CrewList'
 import MarketList from '../Markets/MarketList'
 
@@ -81,7 +81,7 @@ class MainContainer extends Component {
                 <Route exact path='/markets' component={MarketList}/>
                 <Route exact path='/vehicles' component={VehicleTable}/>
                 <Route exact path='/crew' component={CrewList}/>
-                <Route exact path='/map' component={MapOverview}/>
+                <Route exact path='/map' component={MapContainer}/>
               </Switch>
             </Segment>
           </Sidebar.Pusher>
