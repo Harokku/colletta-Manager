@@ -28,10 +28,8 @@ class MainContainer extends Component {
     return (
       <div>
         <Segment tertiary>
-          Colletta Management Console
+          <Button animated onClick={this.toggleVisibility}><Icon circular color='brown' name='list layout' /> Colletta Management Console </Button>
         </Segment>
-
-        <Button onClick={this.toggleVisibility}><Icon name='list layout'/> Menu</Button>
 
         <Sidebar.Pushable as={Segment}>
           <Sidebar as={Menu} animation='scale down' width='thin' visible={visible} icon='labeled' vertical inverted>

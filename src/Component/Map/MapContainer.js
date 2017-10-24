@@ -17,7 +17,11 @@ class MapContainer extends Component {
     }
   }
 
-  subscribeToNewMarketsAndVehicles = () => {
+  // -----------------------
+  // CREATED Subscriptions
+  // -----------------------
+
+  subscribeToNewMarkets = () => {
     this.props.data.subscribeToMore({
       document: gql`
           subscription {
@@ -40,18 +44,101 @@ class MapContainer extends Component {
         const newAllMarkets = [
           subscriptionData.data.Supermarket.node,
           ...previous.allSupermarkets
-        ]
+        ];
         const result = {
           ...previous,
           allSupermarkets: newAllMarkets
-        }
+        };
         return result
       }
     })
   };
 
+  subscribeToNewVehicle = () => {
+    this.props.data.subscribeToMore({
+      document: gql`
+        subscription {
+            Vehicle(filter: {
+                mutation_in: [CREATED]
+            }) {
+                node {
+                    id
+                    radioCode
+                    latitude
+                    longitude
+                    icon
+                    actualLoad
+                    tare
+                    tmfl
+                }
+            }
+        }
+      `,
+      updateQuery: (previous, {subscriptionData}) => {
+        const newAllVehicles = [
+          subscriptionData.data.Vehicle.node,
+          ...previous.allVehicles
+        ];
+        const result = {
+          ...previous,
+          allVehicles: newAllVehicles
+        };
+        return result
+      }
+    })
+  };
+
+  // -----------------------
+  // UPDATED Subscriptions
+  // -----------------------
+
+  subscribeToUpdatedMarket = () => {
+    this.props.data.subscribeToMore({
+      document: gql`
+        subscription {
+            Supermarket(filter: {
+                mutation_in: [UPDATED]
+            }) {
+                node {
+                    id
+                    isClosed
+                }
+            }
+        }
+        `,
+      updateQuery: (previous, {subscriptionData}) => {
+        console.log(subscriptionData)
+      }
+    })
+  };
+
+  subscribeToUpdatedVehicle = () => {
+    this.props.data.subscribeToMore({
+      document: gql`
+        subscription {
+            Vehicle(filter: {
+                mutation_in: [UPDATED]
+            }) {
+                node {
+                    id
+                    latitude
+                    longitude
+                    actualLoad
+                }
+            }
+        }
+      `,
+      updateQuery: (previous, {subscriptionData}) => {
+
+      }
+    })
+  };
+
   componentDidMount() {
-    this.subscribeToNewMarketsAndVehicles()
+    this.subscribeToNewMarkets();
+    this.subscribeToNewVehicle();
+    this.subscribeToUpdatedMarket();
+    this.subscribeToUpdatedVehicle();
   }
 
   render() {
