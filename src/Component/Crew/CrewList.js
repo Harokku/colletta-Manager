@@ -9,7 +9,7 @@ class CrewList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedVehicle: ''
+      selectedVehicle: null,
     }
   }
 
@@ -19,15 +19,26 @@ class CrewList extends Component {
     })
   };
 
-  // TODO: Try to refactor in pure functional way
+  handleCardClose = () => {
+    this.setState({
+      selectedVehicle: null,
+    })
+  }
+
   extractPersonnelsPerShift = (data) => {
-    const filteredVehicle = data.filter(el => {
-      return el.id === this.state.selectedVehicle
-    });
-    return filteredVehicle[0] ? filteredVehicle[0].crews.map(crew => {
-      return <CrewCard key={crew.id} shift={crew.shift} crewID={crew.id} personnels={crew.personnels}/>
-    }) : ''
-  };
+    if (this.state.selectedVehicle) {
+      return data
+        .filter(vehicle => vehicle.id === this.state.selectedVehicle)
+        .reduce((acc, curr) => {
+          return curr.crews
+        }, [])
+        .map(crew => {
+          return <CrewCard cardCloseFunc={this.handleCardClose} key={crew.id} shift={crew.shift} crewID={crew.id} personnels={crew.personnels}/>
+        })
+    } else {
+      return null
+    }
+  }
 
   render() {
 

@@ -51,11 +51,10 @@ class VehicleTable extends Component {
           </Table.Cell>
           <Table.Cell>{Math.round(item.actualLoad / (item.tmfl - item.tare) * 100)}</Table.Cell>
           <Table.Cell>{item.speed}</Table.Cell>
-          <Table.Cell selectable>{item.crews.length > 0
-            ? <a onClick={(e) => this.showSidebarCrew(item.crews, item.id, e)}>Mostra equipaggi</a>
-            : <b>'Nessun equipaggio'</b>
+          {item.crews.length > 0
+            ? <Table.Cell positive selectable><a href='' onClick={(e) => this.showSidebarCrew(item.crews, item.id, e)}>Mostra equipaggi</a> </Table.Cell>
+            : <Table.Cell negative selectable><a>Nessun equipaggio</a> </Table.Cell>
           }
-            </Table.Cell>
         </Table.Row>
       );
     })

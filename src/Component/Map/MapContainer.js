@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {graphql, gql} from 'react-apollo'
 import {Segment, Dimmer, Loader} from 'semantic-ui-react'
-import {Map, TileLayer, Marker} from 'react-leaflet'
+import {Map, TileLayer, Marker, Popup, Tooltip} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet/dist/leaflet'
 import './MapContainer.css'
@@ -170,11 +170,26 @@ class MapContainer extends Component {
     const vehiclesData = this.props.data.allVehicles;
 
     const mapMarketMarkers = marketsData.map(market => {
-      return <Marker key={market.id} position={[market.latitude, market.longitude]} icon={MarketMarkerBuilder(market)}/>
+      return (
+        <Marker key={market.id} position={[market.latitude, market.longitude]} icon={MarketMarkerBuilder(market)}>
+          <Popup>
+            <span>{market.name}</span>
+          </Popup>
+        </Marker>
+      )
     });
 
     const mapVehicleMarkers = vehiclesData.map(vehicle => {
-      return <Marker key={vehicle.id} position={[vehicle.latitude, vehicle.longitude]} icon={VehicleMarkerBuilder(vehicle)}/>
+      return (
+        <Marker key={vehicle.id} position={[vehicle.latitude, vehicle.longitude]} icon={VehicleMarkerBuilder(vehicle)} zIndexOffset={1000}>
+          <Popup>
+            <span>{vehicle.radioCode}</span>
+          </Popup>
+          <Tooltip>
+            <span>{vehicle.radioCode}</span>
+          </Tooltip>
+        </Marker>
+      )
     });
 
     const position =  [this.state.lat, this.state.lon]

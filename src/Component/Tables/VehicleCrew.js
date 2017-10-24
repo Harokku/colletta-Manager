@@ -32,7 +32,7 @@ function listCrew(crews) {
                 Nome:<Label.Detail>{personnel.surname} {personnel.name}</Label.Detail>
               </Label>
               <br/>
-              <Label as='a' color='teal' image basic>
+              <Label color='teal' image basic>
                 Tel:<Label.Detail><a href={'tel:'+personnel.phone}>{personnel.phone}</a></Label.Detail>
               </Label>
               <br/>

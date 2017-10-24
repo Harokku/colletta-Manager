@@ -63,7 +63,6 @@ export default class MapContainer extends Component {
     this.initializeMap()
   }
 
-  // TODO: Implement markets plot function
   render() {
     return (
       <div>

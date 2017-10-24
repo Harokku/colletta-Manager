@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {Card, Label} from 'semantic-ui-react'
+import {Card, Label, Button} from 'semantic-ui-react'
 
 import {ribbonColor, shiftColor} from '../Functions/RibbonColor'
 
@@ -18,7 +18,7 @@ export default class CrewCard extends Component {
           Nome:<Label.Detail>{personnel.surname} {personnel.name}</Label.Detail>
         </Label>
         <br/>
-        <Label as='a' color='teal' image basic>
+        <Label color='teal' image basic>
           Tel:<Label.Detail><a href={'tel:'+personnel.phone}>{personnel.phone}</a></Label.Detail>
         </Label>
         <br/>
@@ -34,6 +34,7 @@ export default class CrewCard extends Component {
         <Card.Content>
           <Card.Header>
             Turno: <Label tag color={shiftColor(this.props.shift)}>{this.props.shift}</Label>
+            <Button floated='right' icon='close' onClick={this.props.cardCloseFunc}/>
           </Card.Header>
         </Card.Content>
         {personnel}
@@ -46,4 +47,5 @@ CrewCard.propTypes = {
   crewID: PropTypes.string.isRequired,
   shift: PropTypes.string.isRequired,
   personnels: PropTypes.array.isRequired,
+  cardCloseFunc: PropTypes.func,
 }

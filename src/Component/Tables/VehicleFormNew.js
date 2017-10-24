@@ -11,6 +11,7 @@ class VehicleFormNew extends Component {
       model: '',
       tmfl: '',
       tare: '',
+      isFormFilled: false,
     }
   }
 
@@ -30,39 +31,57 @@ class VehicleFormNew extends Component {
     } else {
       convertedValue = value.toUpperCase()
     }
-    //const convertedValue = name === 'tmfl' || name === 'tare' ? parseFloat(value) : value.toUpperCase();
     this.setState({
       [name]: convertedValue,
-    })
+    }, this.checkFormValidity)
+  }
+
+  checkFormValidity = () => {
+    const {radioCode, manufacturer, model, tmfl, tare} = this.state
+    if (![radioCode, manufacturer, model, tmfl, tare].some(el => el === '')) {
+      this.setState({
+        isFormFilled: true,
+      })
+    } else {
+      this.setState({
+        isFormFilled: false,
+      })
+    }
   }
 
   // TODO: Implement error handling
   createVehicle = async () => {
-    const {radioCode, manufacturer, model, tmfl, tare} = this.state
-    await this.props.mutate({
-      variables: {
-        radioCode,
-        manufacturer,
-        model,
-        tmfl,
-        tare,
-        actualDateTime: new Date(),
-      }
-    })
-      .then(this.setState({
-        radioCode: '',
-        manufacturer: '',
-        model: '',
-        tmfl: '',
-        tare: '',
-      }))
-  }
+    const {radioCode, manufacturer, model, tmfl, tare} = this.state;
+    if (![radioCode, manufacturer, model, tmfl, tare].some(el => el === '')) {
+      await this.props.mutate({
+        variables: {
+          radioCode,
+          manufacturer,
+          model,
+          tmfl,
+          tare,
+          actualDateTime: new Date(),
+        }
+      })
+        .then(this.setState({
+          radioCode: '',
+          manufacturer: '',
+          model: '',
+          tmfl: '',
+          tare: '',
+        }))
+    } else {
+      this.setState({
+        isFormFilled: false
+      })
+    }
+  };
 
   render() {
     return (
       <div>
         <Header as='h3' color='brown' block>
-          <Button label='Aggiungi nuovo mezzo' icon='add' labelPosition='left' onClick={this.createVehicle}/>
+          <Button disabled={!this.state.isFormFilled} label='Aggiungi nuovo mezzo' icon='add' labelPosition='left' onClick={this.createVehicle}/>
         </Header>
         <Form>
           <Form.Group widths='equal'>
