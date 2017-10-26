@@ -12,11 +12,11 @@ export default class GraphsList extends Component {
 
   render() {
     return (
-      <Grid columns={3}>
-        <Grid.Column>
+      <Grid>
+        <Grid.Column mobile={16} computer={5}>
           <CollectGraph/>
         </Grid.Column>
-        <Grid.Column>
+        <Grid.Column mobile={16} computer={5}>
           <VehicleLoadGraph/>
         </Grid.Column>
       </Grid>
