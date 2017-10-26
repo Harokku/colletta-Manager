@@ -1,11 +1,12 @@
 export function ribbonColor(role) {
-  if (role === 'COORDINAMENTO'){
+  const roleUppercased = role ? role.toUpperCase() : null;
+  if (roleUppercased === 'COORDINAMENTO'){
     return 'orange'
-  } else if (role === 'AUTISTA'){
+  } else if (roleUppercased === 'AUTISTA'){
     return 'olive'
-  } else if (role === 'NAVIGATORE'){
+  } else if (roleUppercased === 'NAVIGATORE'){
     return 'yellow'
-  } else if (role === 'OPMARKET'){
+  } else if (roleUppercased === 'OPMARKET'){
     return 'brown'
   } else {
     return 'black'
@@ -13,9 +14,12 @@ export function ribbonColor(role) {
 }
 
 export function shiftColor(shift){
-  if (shift === 'MATTINA'){
+  const shiftUppercased = shift ? shift.toUpperCase(): null;
+  if (shiftUppercased === 'MATTINA'){
     return 'pink'
-  } else if (shift === 'POMERIGGIO'){
+  } else if (shiftUppercased === 'POMERIGGIO'){
     return 'violet'
+  } else {
+    return 'black'
   }
 }

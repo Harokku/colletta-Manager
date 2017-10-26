@@ -4,29 +4,41 @@ import {graphql, gql} from 'react-apollo'
 
 
 class Counters extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      totalQty: 0
-    }
-  }
 
-  aggregateLoadedQty = (data) => {
-    return data.reduce((accumulator, currValue) => {
-      return accumulator += currValue.loadedQty
-    },0);
+  subscribeToUpdatedCollect = () => {
+    this.props.data.subscribeToMore({
+      document: gql`
+        subscription {
+            Collect(filter: {
+                mutation_in: [CREATED]
+            }) {
+                node {
+                    loadedQty
+                }
+            }
+        }
+      `,
+      updateQuery: (previous, {subscriptionData}) => {
+        const newAllCollects = [
+          subscriptionData.data.Collect.node,
+          ...previous.allCollects
+        ];
+        const result = {
+          ...previous,
+          allCollects: newAllCollects
+        };
+        return result
+      }
+    })
   };
 
+
   componentWillReceiveProps(nextProp) {
-    if (this.props.data.loading && !nextProp.data.loading) {
-      this.setState({totalQty: this.aggregateLoadedQty(nextProp.data.allCollects)})
-    }
+
   }
 
   componentDidMount() {
-    if (this.props.data.networkStatus === 7 && this.state.totalQty === 0) {
-      this.setState({totalQty: this.aggregateLoadedQty(this.props.data.allCollects)})
-    }
+    this.subscribeToUpdatedCollect();
   }
 
   render() {
@@ -71,10 +83,15 @@ class Counters extends Component {
       )
     }
 
+    const collectedQuantity = this.props.data.allCollects;
+    const aggregatedLoadedQuantity = collectedQuantity.reduce((accumulator, currValue) => {
+      return accumulator += currValue.loadedQty
+    },0);
+
     return (
       <div>
         <Statistic.Group widths='one'>
-          <Statistic size='huge' label='Kg Raccolti' value={this.state.totalQty.toString()}/>
+          <Statistic size='huge' label='Kg Raccolti' value={aggregatedLoadedQuantity}/>
         </Statistic.Group>
         <Divider/>
         <Statistic.Group widths='three'>
@@ -108,7 +125,7 @@ const STATS_QUERY = gql`
       count
     }
     allCollects {
-      loadedQty
+        loadedQty
     }
   }
 `
