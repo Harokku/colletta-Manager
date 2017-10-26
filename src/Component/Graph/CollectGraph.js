@@ -11,18 +11,64 @@ class CollectGraph extends Component {
     }
   }
 
+  subscribeToNewCollect = () => {
+    this.props.data.subscribeToMore({
+      document: gql`
+        subscription {
+            Collect(filter: {
+                mutation_in: [CREATED]
+            }) {
+                node {
+                    supermarket {
+                        id
+                    }
+                    loadedQty
+                }
+            } 
+        }
+      `,
+      updateQuery: (previous, {subscriptionData}) => {
+        const newAllCollects = [
+          subscriptionData.data.Collect.node,
+          ...previous.allCollects
+        ];
+        const result = {
+          ...previous,
+          allCollects: newAllCollects
+        };
+        console.log(result);
+        return result
+      }
+    })
+  };
+
   aggregateWithReduce = (data, markets) => {
     return data
       .reduce((accumulator, currValue) => {
-        if (!accumulator.some(el => el.id === currValue.supermarket.id)) {
-          let newItem = {};
-          let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
-          newItem['id'] = currValue.supermarket.id;
-          newItem['markets'] = markets[marketIndex].city + ' - ' + markets[marketIndex].name
-          newItem['Kg'] = 0;
-          accumulator.push(newItem)
+      // Check if current value have a Supermarket assciated
+        if (currValue.supermarket) {
+          // If TRUE add actual loaded quantity to accumulator (initialize it at 0 if needed)
+          if (!accumulator.some(el => el.id === currValue.supermarket.id)) {
+            let newItem = {};
+            let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
+            newItem['id'] = currValue.supermarket.id;
+            newItem['markets'] = markets[marketIndex].city + ' - ' + markets[marketIndex].name
+            newItem['Kg'] = 0;
+            accumulator.push(newItem)
+          }
+          accumulator[accumulator.findIndex(index => index.id === currValue.supermarket.id)].Kg += currValue.loadedQty;
+        } else {
+          // If FALSE add actual loaded quantity to accumulator with default index = 000 (initialize it at 0 if needed)
+          if (!accumulator.some(el => el.id === '000')) {
+            let newItem = {};
+            //let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
+            newItem['id'] = '000';
+            newItem['markets'] = 'Missing Market Data'
+            newItem['Kg'] = 0;
+            accumulator.push(newItem)
+          }
+          accumulator[accumulator.findIndex(index => index.id === '000')].Kg += currValue.loadedQty;
         }
-        accumulator[accumulator.findIndex(index => index.id === currValue.supermarket.id)].Kg += currValue.loadedQty;
         return accumulator
       }, [])
       .sort((a, b) => {
@@ -42,15 +88,11 @@ class CollectGraph extends Component {
   };
 
   componentWillReceiveProps(nextProp) {
-    if (this.props.data.loading && !nextProp.data.loading) {
-      this.setState({graphData: this.aggregateWithReduce(nextProp.data.allCollects, nextProp.data.allSupermarkets)})
-    }
+
   }
 
   componentDidMount() {
-    if (this.props.data.networkStatus === 7 && this.state.graphData.length === 0) {
-      this.setState({graphData: this.aggregateWithReduce(this.props.data.allCollects, this.props.data.allSupermarkets)})
-    }
+    this.subscribeToNewCollect();
   }
 
   render() {
@@ -80,8 +122,10 @@ class CollectGraph extends Component {
     }
 
     // 3
-    //const collectsData = this.props.data.allCollects
-    //const marketsIdList = this.props.data.allSupermarkets
+    const collectsData = this.props.data.allCollects;
+    const marketsIdList = this.props.data.allSupermarkets;
+
+    const graphData = this.aggregateWithReduce(collectsData, marketsIdList)
 
     return (
       <div>
@@ -91,7 +135,7 @@ class CollectGraph extends Component {
         </Header>
         <Segment attached color="green">
           <ResponsiveContainer width='100%' height={350}>
-            <BarChart data={this.state.graphData}
+            <BarChart data={graphData}
                       margin={{top: 5, right: 30, left: 20, bottom: 100}}>
               <XAxis dataKey='markets' angle={-45} textAnchor='end' interval={0}/>
               <YAxis/>
@@ -107,19 +151,19 @@ class CollectGraph extends Component {
 }
 
 const ALL_COLLECT_QUERY = gql`
-  query data {
-    allCollects {
-      supermarket {
-        id
-      }
-      loadedQty
+    query data {
+        allCollects {
+            supermarket {
+                id
+            }
+            loadedQty
+        }
+        allSupermarkets{
+            id
+            city
+            name
+        }
     }
-    allSupermarkets{
-      id
-      city
-      name
-    }
-  }
 `
 
 export default graphql(ALL_COLLECT_QUERY)(CollectGraph)
