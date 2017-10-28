@@ -11,6 +11,26 @@ class VehicleLoadGraph extends Component {
     }
   }
 
+  subscribeToNewLoad = () => {
+    this.props.data.subscribeToMore({
+      document: gql`
+        subscription {
+            Vehicle(filter: {
+                mutation_in: [UPDATED]
+            }) {
+                node {
+                    id
+                    actualLoad
+                }
+            }
+        }
+      `,
+      updateQuery: (previous, {subscriptionData}) => {
+
+      }
+    })
+  };
+
   aggregateWithReduce = (data) => {
     return data
       .reduce((accumulator, currValue) => {
@@ -36,16 +56,18 @@ class VehicleLoadGraph extends Component {
       });
   };
 
+  // TODO: Refactor using const in render method
   componentWillReceiveProps(nextProp) {
-    if (this.props.data.loading && !nextProp.data.loading) {
+    /*if (this.props.data.loading && !nextProp.data.loading) {
       this.setState({graphData: this.aggregateWithReduce(nextProp.data.allVehicles)})
-    }
+    }*/
   }
 
   componentDidMount() {
-    if (this.props.data.networkStatus === 7 && this.state.graphData.length === 0) {
+    /*if (this.props.data.networkStatus === 7 && this.state.graphData.length === 0) {
       this.setState({graphData: this.aggregateWithReduce(this.props.data.allVehicles)})
-    }
+    }*/
+    this.subscribeToNewLoad();
   }
 
   render() {
@@ -74,7 +96,7 @@ class VehicleLoadGraph extends Component {
     }
 
     // 3
-    //const vehiclesData = this.props.data.vehiclesData
+    const vehiclesData = this.props.data.allVehicles
 
 
     return (
@@ -85,7 +107,7 @@ class VehicleLoadGraph extends Component {
         </Header>
         <Segment attached color="teal">
           <ResponsiveContainer width='100%' height={350}>
-            <BarChart data={this.state.graphData}
+            <BarChart data={this.aggregateWithReduce(vehiclesData)}
                       margin={{top: 5, right: 30, left: 20, bottom: 100}}>
               <XAxis dataKey='vehicles' angle={-45} textAnchor='end' interval={0}/>
               <YAxis/>
