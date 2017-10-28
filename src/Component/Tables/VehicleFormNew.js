@@ -109,7 +109,6 @@ const ADD_VEHICLE_MUTATION = gql`
     $model: String!
     $tmfl: Float!
     $tare: Float!
-    $actualDateTime: DateTime!
     ){
         createVehicle (
             radioCode: $radioCode
@@ -123,7 +122,6 @@ const ADD_VEHICLE_MUTATION = gql`
             collects: {
                 tripNumber: 1
                 loadedQty: 0
-                collectedAt: $actualDateTime
                 supermarketId: "cj916fo3w4oxa018137w05hh3"
             }
         ){

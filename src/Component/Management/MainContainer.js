@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Sidebar, Segment, Button, Menu, Icon} from 'semantic-ui-react'
+import {Sidebar, Segment, Button, Menu, Icon, Popup} from 'semantic-ui-react'
 import {Link, Switch, Route} from 'react-router-dom'
 import {withRouter} from 'react-router'
 
@@ -11,6 +11,7 @@ import VehicleTable from '../Tables/VehicleTable'
 import MapContainer from '../Map/MapContainer'
 import CrewList from '../Crew/CrewList'
 import MarketList from '../Markets/MarketList'
+import SendInstaMessage from './SendInstaMessage'
 
 class MainContainer extends Component {
   constructor(props) {
@@ -29,6 +30,12 @@ class MainContainer extends Component {
       <div>
         <Segment tertiary>
           <Button animated onClick={this.toggleVisibility}><Icon circular color='brown' name='list layout' /> Colletta Management Console </Button>
+          <Popup
+          trigger={<Button color='brown' content='Invia messaggio' float='right'/>}
+          on='click'
+          position='bottom center'>
+            <SendInstaMessage/>
+          </Popup>
         </Segment>
 
         <Sidebar.Pushable as={Segment}>
