@@ -1,55 +1,43 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-
-import './MarketsMap.css'
+import {Map, TileLayer, Marker, Popup, Tooltip} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import L from 'leaflet/dist/leaflet'
-import 'leaflet-extra-markers/dist/css/leaflet.extra-markers.min.css'
-import 'leaflet-extra-markers/dist/js/leaflet.extra-markers.min'
+import 'leaflet/dist/leaflet'
+import './MarketsMap.css'
+import {SimpleMarketMarkerBuilder} from '../Map/MarkerBuilder'
 
 export default class MarketsMap extends Component {
   constructor(props) {
     super(props);
     this.marker = null;
     this.state = {
-
-    }
-  }
-
-  componentDidMount () {
-    this.el = L.map('marketsMap').setView(this.props.marketCoords, 8);
-    this.initializeMap();
-  }
-
-  initializeMap = () => {
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 18,
-    }).addTo(this.el);
-  };
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.marketCoords !== this.props.marketCoords) {
-      if (this.marker !== null) {
-        this.marker.remove(this.el)
-      }
-      this.el.flyTo(this.props.marketCoords, 16)
-      const markMarker = L.ExtraMarkers.icon({
-        icon: 'fa-shopping-cart',
-        markerColor: this.props.isClosed ? 'orange-dark' : 'blue-dark',
-        iconColor: 'white',
-        shape: 'square',
-        prefix: 'fa'
-      })
-      this.marker = L.marker(this.props.marketCoords, {icon: markMarker}).addTo(this.el)
-      this.marker.bindPopup(this.props.marketName)
-      //this.props.marketName !== '' ? this.marker.bindPopup(this.props.marketName) : null
+      lat: 45.8518,
+      lon: 8.7561,
+      zoom: 18,
     }
   }
 
   render() {
+
+    const position = [this.state.lat, this.state.lon]
     return (
-      <div id='marketsMap'>
+      <div>
+        <Map center={this.props.marketCoords ? this.props.marketCoords : position}
+             zoom={this.state.zoom}
+             useFlyTo
+        >
+          <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+          />
+          <Marker position={this.props.marketCoords} icon={SimpleMarketMarkerBuilder(this.props.isClosed)}>
+            <Popup>
+              <span>{this.props.marketName}</span>
+            </Popup>
+            <Tooltip>
+              <span>{this.props.marketName}</span>
+            </Tooltip>
+          </Marker>
+        </Map>
       </div>
     )
   }

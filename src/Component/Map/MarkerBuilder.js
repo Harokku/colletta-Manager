@@ -13,6 +13,17 @@ export function MarketMarkerBuilder(markerData) {
   })
 }
 
+export function SimpleMarketMarkerBuilder(isClosed) {
+  return L.ExtraMarkers.icon({
+    extraClasses: 'fa-3x',
+    icon: 'fa-shopping-cart',
+    markerColor: isClosed ? 'orange-dark' : 'blue-dark',
+    iconColor: 'white',
+    shape: 'square',
+    prefix: 'fa',
+  })
+}
+
 export function VehicleMarkerBuilder(markerData) {
   return L.ExtraMarkers.icon({
     extraClasses: 'fa-3x',

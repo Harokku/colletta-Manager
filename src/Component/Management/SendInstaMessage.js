@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
 import {Dropdown, Input} from 'semantic-ui-react'
 import {graphql, gql, compose} from 'react-apollo'
+import {ToastContainer, toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.min.css'
 
 class SendInstaMessage extends Component {
   constructor(props) {
@@ -8,13 +10,16 @@ class SendInstaMessage extends Component {
     this.state = {
       searchQuery: null,
       value: '',
+      selectedVehicle: '',
       messageToSend: '',
     }
   }
 
   handleChange = (e, {value}) => {
+    const vehicleRadioCode = this.props.data.allVehicles.find(vehicle => vehicle.id === value)
     this.setState({
-      value
+      value,
+      selectedVehicle: vehicleRadioCode.radioCode,
     })
   };
   handleSearchChange = (e, {searchQuery}) => {
@@ -26,18 +31,22 @@ class SendInstaMessage extends Component {
   handleClick = async (e) => {
     e.preventDefault();
     console.log('Sending message')
-    await this.props.mutate({
-      variables: {
-        vehicleId: this.state.value,
-        message: this.state.messageToSend,
-      }
-    })
-      .then(
-        this.setState({
-          value: '',
-          messageToSend: '',
-        })
-      )
+    try {
+      await this.props.mutate({
+        variables: {
+          vehicleId: this.state.value,
+          message: this.state.messageToSend,
+        }
+      });
+      this.setState({
+        value: '',
+        messageToSend: '',
+      });
+      toast.success('Messaggio per ' + this.state.selectedVehicle + ' inviato')
+    }
+    catch(error){
+      toast.error('Messaggio per ' + this.state.selectedVehicle + ' NON inviato')
+    }
   };
 
   handleInputChange = (e) => {
@@ -65,6 +74,12 @@ class SendInstaMessage extends Component {
 
     return (
       <div>
+        <ToastContainer
+          position='bottom-center'
+          autoclose={500}
+          newestOnTop={true}
+          closeOnClick
+        />
         <Dropdown
           selection
           search
