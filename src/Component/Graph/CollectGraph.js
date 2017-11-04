@@ -19,6 +19,7 @@ class CollectGraph extends Component {
                 mutation_in: [CREATED]
             }) {
                 node {
+                    id
                     supermarket {
                         id
                     }
@@ -42,53 +43,72 @@ class CollectGraph extends Component {
     })
   };
 
+  // TODO: Fix method fired before subscription update
   aggregateWithReduce = (data, markets) => {
-    return data
-      .reduce((accumulator, currValue) => {
-      // Check if current value have a Supermarket assciated
-        if (currValue.supermarket) {
-          // If TRUE add actual loaded quantity to accumulator (initialize it at 0 if needed)
-          if (!accumulator.some(el => el.id === currValue.supermarket.id)) {
-            let newItem = {};
-            let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
-            newItem['id'] = currValue.supermarket.id;
-            newItem['markets'] = markets[marketIndex].city + ' - ' + markets[marketIndex].name
-            newItem['Kg'] = 0;
-            accumulator.push(newItem)
+    console.log(data)
+    try {
+      return data
+        .reduce((accumulator, currValue) => {
+          // Check if current value have a Supermarket associated
+          if (currValue.supermarket) {
+            // If TRUE add actual loaded quantity to accumulator (initialize it at 0 if needed)
+            if (!accumulator.some(el => el.id === currValue.supermarket.id)) {
+              let newItem = {};
+              let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
+              newItem['id'] = currValue.supermarket.id;
+              newItem['markets'] = markets[marketIndex].city + ' - ' + markets[marketIndex].name
+              newItem['Kg'] = 0;
+              accumulator.push(newItem)
+            }
+            accumulator[accumulator.findIndex(index => index.id === currValue.supermarket.id)].Kg += currValue.loadedQty;
+          } else {
+            // If FALSE add actual loaded quantity to accumulator with default index = 000 (initialize it at 0 if needed)
+            if (!accumulator.some(el => el.id === '000')) {
+              let newItem = {};
+              //let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
+              newItem['id'] = '000';
+              newItem['markets'] = 'Missing Market Data'
+              newItem['Kg'] = 0;
+              accumulator.push(newItem)
+            }
+            accumulator[accumulator.findIndex(index => index.id === '000')].Kg += currValue.loadedQty;
           }
-          accumulator[accumulator.findIndex(index => index.id === currValue.supermarket.id)].Kg += currValue.loadedQty;
-        } else {
-          // If FALSE add actual loaded quantity to accumulator with default index = 000 (initialize it at 0 if needed)
-          if (!accumulator.some(el => el.id === '000')) {
-            let newItem = {};
-            //let marketIndex = markets.findIndex(index => index.id === currValue.supermarket.id)
-            newItem['id'] = '000';
-            newItem['markets'] = 'Missing Market Data'
-            newItem['Kg'] = 0;
-            accumulator.push(newItem)
+          return accumulator
+        }, [])
+        .sort((a, b) => {
+          let nameA = a.markets.toUpperCase(); // ignore upper and lowercase
+          let nameB = b.markets.toUpperCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+            return -1;
           }
-          accumulator[accumulator.findIndex(index => index.id === '000')].Kg += currValue.loadedQty;
-        }
-        return accumulator
-      }, [])
-      .sort((a, b) => {
-        let nameA = a.markets.toUpperCase(); // ignore upper and lowercase
-        let nameB = b.markets.toUpperCase(); // ignore upper and lowercase
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
+          if (nameA > nameB) {
+            return 1;
+          }
 
-        // names must be equal
-        return 0;
-      });
-
+          // names must be equal
+          return 0;
+        });
+    } catch (err){
+      console.log(err)
+      return '';
+    }
   };
 
   componentWillReceiveProps(nextProp) {
-
+    if(nextProp.data && this.props.data.loading){
+      console.log('Calculating graph data')
+      const graphData = this.aggregateWithReduce(nextProp.data.allCollects,nextProp.data.allSupermarkets)
+      this.setState({graphData})
+    }
+    try {
+      if (nextProp.data.allCollects.length > this.props.data.allCollects.length) {
+        console.log('Updating graph data')
+        const graphData = this.aggregateWithReduce(nextProp.data.allCollects, nextProp.data.allSupermarkets)
+        this.setState({graphData})
+      }
+    } catch(err) {
+      console.log('Still waiting for data...')
+    }
   }
 
   componentDidMount() {
@@ -122,10 +142,11 @@ class CollectGraph extends Component {
     }
 
     // 3
-    const collectsData = this.props.data.allCollects;
-    const marketsIdList = this.props.data.allSupermarkets;
+    //const collectsData = this.props.data.allCollects;
+    //const marketsIdList = this.props.data.allSupermarkets;
 
-    const graphData = this.aggregateWithReduce(collectsData, marketsIdList)
+    //const graphData = this.aggregateWithReduce(collectsData, marketsIdList)
+    const graphData = this.state.graphData;
 
     return (
       <div>
@@ -153,6 +174,7 @@ class CollectGraph extends Component {
 const ALL_COLLECT_QUERY = gql`
     query data {
         allCollects {
+            id
             supermarket {
                 id
             }

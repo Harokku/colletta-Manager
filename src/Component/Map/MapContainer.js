@@ -1,11 +1,12 @@
 import React, {Component} from 'react'
 import {graphql, gql} from 'react-apollo'
-import {Segment, Dimmer, Loader} from 'semantic-ui-react'
+import {Segment, Dimmer, Loader,} from 'semantic-ui-react'
 import {Map, TileLayer, Marker, Popup, Tooltip} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet/dist/leaflet'
 import './MapContainer.css'
 import {MarketMarkerBuilder, VehicleMarkerBuilder} from './MarkerBuilder'
+import MapPopupVehicle from './MapPopupVehicle'
 
 class MapContainer extends Component {
   constructor(props) {
@@ -57,22 +58,22 @@ class MapContainer extends Component {
   subscribeToNewVehicle = () => {
     this.props.data.subscribeToMore({
       document: gql`
-        subscription {
-            Vehicle(filter: {
-                mutation_in: [CREATED]
-            }) {
-                node {
-                    id
-                    radioCode
-                    latitude
-                    longitude
-                    icon
-                    actualLoad
-                    tare
-                    tmfl
-                }
-            }
-        }
+          subscription {
+              Vehicle(filter: {
+                  mutation_in: [CREATED]
+              }) {
+                  node {
+                      id
+                      radioCode
+                      latitude
+                      longitude
+                      icon
+                      actualLoad
+                      tare
+                      tmfl
+                  }
+              }
+          }
       `,
       updateQuery: (previous, {subscriptionData}) => {
         const newAllVehicles = [
@@ -95,17 +96,17 @@ class MapContainer extends Component {
   subscribeToUpdatedMarket = () => {
     this.props.data.subscribeToMore({
       document: gql`
-        subscription {
-            Supermarket(filter: {
-                mutation_in: [UPDATED]
-            }) {
-                node {
-                    id
-                    isClosed
-                }
-            }
-        }
-        `,
+          subscription {
+              Supermarket(filter: {
+                  mutation_in: [UPDATED]
+              }) {
+                  node {
+                      id
+                      isClosed
+                  }
+              }
+          }
+      `,
       updateQuery: (previous, {subscriptionData}) => {
         console.log(subscriptionData)
       }
@@ -115,18 +116,18 @@ class MapContainer extends Component {
   subscribeToUpdatedVehicle = () => {
     this.props.data.subscribeToMore({
       document: gql`
-        subscription {
-            Vehicle(filter: {
-                mutation_in: [UPDATED]
-            }) {
-                node {
-                    id
-                    latitude
-                    longitude
-                    actualLoad
-                }
-            }
-        }
+          subscription {
+              Vehicle(filter: {
+                  mutation_in: [UPDATED]
+              }) {
+                  node {
+                      id
+                      latitude
+                      longitude
+                      actualLoad
+                  }
+              }
+          }
       `,
       updateQuery: (previous, {subscriptionData}) => {
 
@@ -181,9 +182,10 @@ class MapContainer extends Component {
 
     const mapVehicleMarkers = vehiclesData.map(vehicle => {
       return (
-        <Marker key={vehicle.id} position={[vehicle.latitude, vehicle.longitude]} icon={VehicleMarkerBuilder(vehicle)} zIndexOffset={1000}>
+        <Marker key={vehicle.id} position={[vehicle.latitude, vehicle.longitude]} icon={VehicleMarkerBuilder(vehicle)}
+                zIndexOffset={1000}>
           <Popup>
-            <span>{vehicle.radioCode}</span>
+            <MapPopupVehicle data={vehicle}/>
           </Popup>
           <Tooltip>
             <span>{vehicle.radioCode}</span>
@@ -192,16 +194,16 @@ class MapContainer extends Component {
       )
     });
 
-    const position =  [this.state.lat, this.state.lon]
+    const position = [this.state.lat, this.state.lon]
     return (
       <div>
-      <Map center={position} zoom={this.state.zoom}>
-        <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                   attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-        />
-        {mapMarketMarkers}
-        {mapVehicleMarkers}
-      </Map>
+        <Map id='mainMap' center={position} zoom={this.state.zoom}>
+          <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+          />
+          {mapMarketMarkers}
+          {mapVehicleMarkers}
+        </Map>
       </div>
     )
   }
@@ -225,6 +227,7 @@ const ALL_MAP_DATA = gql`
             longitude
             icon
             actualLoad
+            speed
             tare
             tmfl
         }

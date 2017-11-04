@@ -60,6 +60,28 @@ class VehicleTable extends Component {
     })
   };
 
+  subscribeToUpdatedSpeed = () =>{
+    this.props.data.subscribeToMore({
+      document: gql`
+        subscription {
+            Vehicle(filter: {
+                mutation_in: [UPDATED]
+            }) {
+                node {
+                    id
+                    speed
+                    actualLoad
+                }
+            }
+        }
+      `
+    })
+  }
+
+  componentDidMount (){
+    this.subscribeToUpdatedSpeed()
+  }
+
   render() {
 
     if (this.props.data && this.props.data.loading) {

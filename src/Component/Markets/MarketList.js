@@ -25,7 +25,6 @@ class MarketList extends Component {
       selectedMarketStatus: status,
     })
   };
-
   render() {
 
     if (this.props.data && this.props.data.loading) {

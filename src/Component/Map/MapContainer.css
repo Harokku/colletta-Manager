@@ -1,4 +1,12 @@
+/*
 .leaflet-container {
+    height: 87vh;
+    width: 95%;
+    margin: 0 auto;
+}
+*/
+
+#mainMap {
     height: 87vh;
     width: 95%;
     margin: 0 auto;

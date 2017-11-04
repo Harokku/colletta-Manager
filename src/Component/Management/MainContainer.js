@@ -13,6 +13,9 @@ import CrewList from '../Crew/CrewList'
 import MarketList from '../Markets/MarketList'
 import SendInstaMessage from './SendInstaMessage'
 
+//import ShiftOutline from '../Crew/ShiftOutline'
+
+
 class MainContainer extends Component {
   constructor(props) {
     super(props);

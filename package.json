@@ -8,6 +8,7 @@
     "leaflet-extra-markers": "^1.0.6",
     "leaflet-geosearch": "^2.6.0",
     "lodash": "^4.17.4",
+    "moment": "^2.19.1",
     "npm": "^5.5.1",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
