@@ -11,14 +11,14 @@ export default function Dashboard(props) {
       <Segment>
         <Counters/>
       </Segment>
-      <Grid>
+      {/*<Grid>
         <Grid.Column mobile={16} computer={8}>
           <VehicleLoadGraph/>
         </Grid.Column>
         <Grid.Column mobile={16} computer={8}>
           <CollectGraph/>
         </Grid.Column>
-      </Grid>
+      </Grid>*/}
     </div>
   )
 }

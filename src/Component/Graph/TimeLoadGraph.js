@@ -1,8 +1,9 @@
 import React, {Component} from 'react'
 import {graphql, gql} from 'react-apollo'
 import {Dimmer, Loader, Segment, Header, Icon} from 'semantic-ui-react'
-import {ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Line, Label} from 'recharts'
+import {ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Line, Tooltip} from 'recharts'
 import moment from 'moment';
+import * as d3 from 'd3'
 
 
 class TimeLoadGraph extends Component {
@@ -11,20 +12,17 @@ class TimeLoadGraph extends Component {
   }
 
   // TODO: Implement real time updates
-
-  // TODO: Aggregate time in classes of 1 hour
   aggregateData = (data) => {
-    let returnData = data
+    const orderedClassedData = data
       .map(dataPoint => {
         return {
-          time: dataPoint.createdAt,
+          time: moment(dataPoint.createdAt, moment.ISO_8601).format("ddd - HH"),
           value: dataPoint.loadedQty,
-          displayTime: moment(dataPoint.createdAt).format("HH:mm")
         }
       })
       .sort((a,b) => {
-        let timeA = moment(a.time).unix()
-        let timeB = moment(b.time).unix()
+        let timeA = moment(a.time, "ddd - HH").unix()
+        let timeB = moment(b.time, "ddd - HH").unix()
 
         if (timeA < timeB) {
           return -1;
@@ -37,8 +35,16 @@ class TimeLoadGraph extends Component {
         return 0;
 
       })
-    console.log(returnData)
-    return returnData
+    console.log(orderedClassedData)
+
+    const graphData = d3.nest()
+      .key(d => {return d.time})
+      .rollup(v => {return d3.sum(v, d => { return d.value})})
+      .entries(orderedClassedData)
+
+    console.log(graphData)
+
+    return graphData
   }
 
   render() {
@@ -80,10 +86,11 @@ class TimeLoadGraph extends Component {
           <ResponsiveContainer width='100%' height={350}>
             <LineChart data={ this.aggregateData(timeSeriesData)}
                        margin={{top: 5, right: 30, left: 20, bottom: 100}}>
-              <XAxis dataKey='displayTime' angle={-45} textAnchor={'end'} interval={0}/>
+              <XAxis dataKey='key' angle={-45} textAnchor={'end'} interval={0}/>
               <YAxis label={{ value: 'Kg caricati', angle: -90, position: 'left' }}/>
               <CartesianGrid/>
-              <Line type='natural' dataKey='value'/>
+              <Tooltip/>
+              <Line type='natural' dataKey='value' stroke='#FF3F49' activeDot={{r: 8}} animationDuration='2500'/>
             </LineChart>
           </ResponsiveContainer>
         </Segment>

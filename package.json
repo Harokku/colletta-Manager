@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "d3": "^4.11.0",
     "install": "^0.10.1",
     "leaflet": "^1.2.0",
     "leaflet-extra-markers": "^1.0.6",
