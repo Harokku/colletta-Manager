@@ -29,6 +29,7 @@ class CollectGraph extends Component {
         }
       `,
       updateQuery: (previous, {subscriptionData}) => {
+        console.log("Subscription fired")
         const newAllCollects = [
           subscriptionData.data.Collect.node,
           ...previous.allCollects
@@ -37,13 +38,12 @@ class CollectGraph extends Component {
           ...previous,
           allCollects: newAllCollects
         };
-        console.log(result);
         return result
       }
     })
   };
 
-  // TODO: Fix method fired before subscription update
+  // FIXME: Fix method double call
   aggregateWithReduce = (data, markets) => {
     console.log(data)
     try {
@@ -94,7 +94,13 @@ class CollectGraph extends Component {
     }
   };
 
-  componentWillReceiveProps(nextProp) {
+  /*componentWillReceiveProps(nextProp) {
+    console.log("next all collect")
+    console.log(nextProp.data.allCollects)
+    console.log("this all collect")
+    console.log(this.props.data.allCollects)
+    console.log("next all markets")
+    console.log(nextProp.data.allSupermarkets)
     if(nextProp.data && this.props.data.loading){
       console.log('Calculating graph data')
       const graphData = this.aggregateWithReduce(nextProp.data.allCollects,nextProp.data.allSupermarkets)
@@ -109,7 +115,7 @@ class CollectGraph extends Component {
     } catch(err) {
       console.log('Still waiting for data...')
     }
-  }
+  }*/
 
   componentDidMount() {
     this.subscribeToNewCollect();
@@ -142,11 +148,11 @@ class CollectGraph extends Component {
     }
 
     // 3
-    //const collectsData = this.props.data.allCollects;
-    //const marketsIdList = this.props.data.allSupermarkets;
+    const collectsData = this.props.data.allCollects;
+    const marketsIdList = this.props.data.allSupermarkets;
 
-    //const graphData = this.aggregateWithReduce(collectsData, marketsIdList)
-    const graphData = this.state.graphData;
+    const graphData = this.aggregateWithReduce(collectsData, marketsIdList)
+    //const graphData = this.state.graphData;
 
     return (
       <div>
