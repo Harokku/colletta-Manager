@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {Table, Divider} from 'semantic-ui-react'
 import MarketsMap from './MarketsMap'
 import {Segment, Loader, Dimmer} from 'semantic-ui-react'
-import {graphql, gql} from 'react-apollo'
+import {graphql, gql, compose} from 'react-apollo'
 
 import './MarketList.css'
 
@@ -25,6 +25,18 @@ class MarketList extends Component {
       selectedMarketStatus: status,
     })
   };
+
+  toggleIsClosed = async (id, isClosed, e) => {
+    e.preventDefault();
+
+    await this.props.mutate({
+      variables: {
+        id,
+        isClosed: !isClosed,
+      }
+    })
+  }
+
   render() {
 
     if (this.props.data && this.props.data.loading) {
@@ -68,8 +80,10 @@ class MarketList extends Component {
                            market.isClosed,
                            e)}>{market.address}</a>
           </Table.Cell>
-          <Table.Cell><a href={'tel:'+market.managerPhone}>{market.managerPhone}</a></Table.Cell>
-          <Table.Cell>{market.isClosed ? 'Gia chiuso' : 'Ancora aperto'}</Table.Cell>
+          <Table.Cell><a href={'tel:' + market.managerPhone}>{market.managerPhone}</a></Table.Cell>
+          <Table.Cell><a href=''
+                         onClick={(e) => this.toggleIsClosed(market.id, market.isClosed,e)}
+          >{market.isClosed ? 'Gia chiuso' : 'Ancora aperto'}</a></Table.Cell>
         </Table.Row>
       )
     });
@@ -77,21 +91,21 @@ class MarketList extends Component {
     return (
       <div>
         <div className='scrollTable'>
-        <Table selectable>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Citta'</Table.HeaderCell>
-              <Table.HeaderCell>Nome</Table.HeaderCell>
-              <Table.HeaderCell>Indirizzo</Table.HeaderCell>
-              <Table.HeaderCell>Tel. Responsabile</Table.HeaderCell>
-              <Table.HeaderCell>Stato Apertura</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
+          <Table selectable>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Citta'</Table.HeaderCell>
+                <Table.HeaderCell>Nome</Table.HeaderCell>
+                <Table.HeaderCell>Indirizzo</Table.HeaderCell>
+                <Table.HeaderCell>Tel. Responsabile</Table.HeaderCell>
+                <Table.HeaderCell>Stato Apertura</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
 
-          <Table.Body>
-            {marketsList}
-          </Table.Body>
-        </Table>
+            <Table.Body>
+              {marketsList}
+            </Table.Body>
+          </Table>
         </div>
 
         <Divider/>
@@ -118,4 +132,28 @@ const GET_ALL_MARKETS = gql`
     }
 `
 
-export default graphql(GET_ALL_MARKETS)(MarketList)
+const TOGGLE_MARKET_ISOPEN = gql`
+    mutation toggleIsOpen (
+    $id: ID!
+    $isClosed: Boolean
+    ){
+        updateSupermarket(
+            id: $id
+            isClosed: $isClosed
+        ) {
+            id
+            city
+            name
+            address
+            isClosed
+            managerPhone
+            latitude
+            longitude
+        }
+    }
+`
+
+export default compose(
+  graphql(GET_ALL_MARKETS),
+  graphql(TOGGLE_MARKET_ISOPEN),
+)(MarketList)
