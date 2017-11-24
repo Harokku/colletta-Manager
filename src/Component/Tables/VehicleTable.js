@@ -49,6 +49,7 @@ class VehicleTable extends Component {
               : item.radioCode
             }
           </Table.Cell>
+          <Table.Cell>{item.bancoCode}</Table.Cell>
           <Table.Cell>{Math.round(item.actualLoad / (item.tmfl - item.tare) * 100)}</Table.Cell>
           <Table.Cell>{item.speed}</Table.Cell>
           {item.crews.length > 0
@@ -129,6 +130,7 @@ class VehicleTable extends Component {
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Codice Radio</Table.HeaderCell>
+                <Table.HeaderCell>Codice Banco</Table.HeaderCell>
                 <Table.HeaderCell>% di carico</Table.HeaderCell>
                 <Table.HeaderCell>Velocita'</Table.HeaderCell>
                 <Table.HeaderCell>Turno</Table.HeaderCell>
@@ -150,9 +152,10 @@ class VehicleTable extends Component {
 
 const ALL_VEHICLES_QUERY = gql`
   query getAllVehicles {
-    allVehicles {
+    allVehicles ( orderBy: bancoCode_ASC ){
       id
       radioCode
+      bancoCode
       actualLoad
       tare
       tmfl
