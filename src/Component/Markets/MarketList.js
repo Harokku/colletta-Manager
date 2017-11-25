@@ -80,6 +80,7 @@ class MarketList extends Component {
                            market.isClosed,
                            e)}>{market.address}</a>
           </Table.Cell>
+          <Table.Cell>{market.nanagerName}</Table.Cell>
           <Table.Cell><a href={'tel:' + market.managerPhone}>{market.managerPhone}</a></Table.Cell>
           <Table.Cell><a href=''
                          onClick={(e) => this.toggleIsClosed(market.id, market.isClosed,e)}
@@ -97,6 +98,7 @@ class MarketList extends Component {
                 <Table.HeaderCell>Citta'</Table.HeaderCell>
                 <Table.HeaderCell>Nome</Table.HeaderCell>
                 <Table.HeaderCell>Indirizzo</Table.HeaderCell>
+                <Table.HeaderCell>Nome responsabile</Table.HeaderCell>
                 <Table.HeaderCell>Tel. Responsabile</Table.HeaderCell>
                 <Table.HeaderCell>Stato Apertura</Table.HeaderCell>
               </Table.Row>
@@ -119,13 +121,16 @@ class MarketList extends Component {
 
 const GET_ALL_MARKETS = gql`
     query allMarkets {
-        allSupermarkets (orderBy: city_ASC) {
+        allSupermarkets (
+            filter: { isOur: true }
+            orderBy: city_ASC) {
             id
             city
             name
             address
             isClosed
             managerPhone
+            nanagerName
             latitude
             longitude
         }
@@ -147,6 +152,7 @@ const TOGGLE_MARKET_ISOPEN = gql`
             address
             isClosed
             managerPhone
+            nanagerName
             latitude
             longitude
         }

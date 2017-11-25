@@ -32,5 +32,8 @@
     "watch": "react-scripts test --env=jsdom --watch",
     "coverage": "react-scripts test --env=jsdom --coverage",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.59.0"
   }
 }
