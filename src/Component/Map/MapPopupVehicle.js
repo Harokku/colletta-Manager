@@ -20,7 +20,7 @@ export default class MapPopupVehicle extends Component {
     return (
       <Card>
         <Card.Content>
-          <Card.Header>{data.radioCode}</Card.Header>
+          <Card.Header>{data.bancoCode}</Card.Header>
         </Card.Content>
         <Card.Content>
           <List>

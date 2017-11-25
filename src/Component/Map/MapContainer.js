@@ -188,7 +188,7 @@ class MapContainer extends Component {
             <MapPopupVehicle data={vehicle}/>
           </Popup>
           <Tooltip>
-            <span>{vehicle.radioCode}</span>
+            <span>{vehicle.bancoCode}</span>
           </Tooltip>
         </Marker>
       )
@@ -223,6 +223,7 @@ const ALL_MAP_DATA = gql`
         allVehicles {
             id
             radioCode
+            bancoCode
             latitude
             longitude
             icon
